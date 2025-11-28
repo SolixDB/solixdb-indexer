@@ -1,0 +1,874 @@
+#![deny(
+    clippy::disallowed_methods,
+    clippy::suspicious,
+    clippy::style,
+    clippy::clone_on_ref_ptr,
+    missing_debug_implementations,
+    missing_copy_implementations
+)]
+#![warn(clippy::pedantic, missing_docs)]
+#![allow(clippy::module_name_repetitions)]
+
+//! This crate provides the core components necessary for implementing parsers
+//! for the `yellowstone-vixen` family of crates.  This crate should be used
+//! as a dependency instead of `yellowstone-vixen` for crates that intend to
+//! define and export Vixen parsers as libraries without needing to access the
+//! runtime functionality of Vixen.
+
+use std::{
+    borrow::Cow,
+    collections::{HashMap, HashSet},
+    fmt::{self, Debug},
+    future::Future,
+    str::FromStr,
+    sync::Arc,
+};
+
+use borsh::{BorshDeserialize, BorshSerialize};
+use serde::Deserialize;
+use yellowstone_grpc_proto::geyser::{
+    self, SubscribeRequest, SubscribeRequestFilterAccounts, SubscribeRequestFilterBlocks,
+    SubscribeRequestFilterBlocksMeta, SubscribeRequestFilterSlots,
+    SubscribeRequestFilterTransactions, SubscribeUpdateAccount, SubscribeUpdateAccountInfo,
+    SubscribeUpdateBlock, SubscribeUpdateBlockMeta, SubscribeUpdateSlot,
+    SubscribeUpdateTransaction,
+};
+
+pub extern crate bs58;
+#[cfg(feature = "proto")]
+pub extern crate yellowstone_vixen_proto;
+
+pub mod instruction;
+#[cfg(feature = "proto")]
+pub mod proto;
+
+type BoxedError = Box<dyn std::error::Error + Send + Sync + 'static>;
+
+/// An error returned by a Vixen parser
+#[derive(Debug)]
+pub enum ParseError {
+    /// The parser received an undesired update and requested to skip
+    /// processing for it.  No error will be logged by the Vixen runtime, and
+    /// no handlers registered to this parser will be executed.
+    Filtered,
+    /// The parser encountered an error while processing an update.
+    Other(BoxedError),
+}
+
+impl<T: Into<BoxedError>> From<T> for ParseError {
+    #[inline]
+    fn from(value: T) -> Self { Self::Other(value.into()) }
+}
+
+/// The result of parsing an update.
+pub type ParseResult<T> = Result<T, ParseError>;
+
+/// An account update from Yellowstone.
+pub type AccountUpdate = SubscribeUpdateAccount;
+/// An account update from Yellowstone.
+pub type AccountUpdateInfo = SubscribeUpdateAccountInfo;
+/// A transaction update from Yellowstone.
+pub type TransactionUpdate = SubscribeUpdateTransaction;
+/// A block meta update from Yellowstone.
+pub type BlockMetaUpdate = SubscribeUpdateBlockMeta;
+/// A block update from Yellowstone.
+pub type BlockUpdate = SubscribeUpdateBlock;
+/// A slot update from Yellowstone.
+pub type SlotUpdate = SubscribeUpdateSlot;
+
+/// Generic output type for instruction parsers that wraps shared data for all instructions
+/// in the given transaction.
+///
+/// This is the recommended structure for an `Parser::Output` associated type, for the case that the parser
+/// wants to expose the `InstructionShared` data to the `Handler`s
+#[derive(Debug)]
+pub struct InstructionUpdateOutput<T> {
+    /// The parsed instruction.
+    pub parsed_ix: T,
+    /// Shared data for all instructions in the given transaction.
+    pub shared_data: Arc<instruction::InstructionShared>,
+}
+
+/// A core trait that defines the parse logic for producing a parsed value from
+/// a Vixen update (typically [`AccountUpdate`], [`TransactionUpdate`], or
+/// [`InstructionUpdate`](instruction::InstructionUpdate)).
+pub trait Parser {
+    /// The input update type for this parser.
+    type Input;
+    /// The type of the parsed value produced by this parser.
+    type Output;
+
+    /// A unique ID for this parser.  Used to associate the parser with its
+    /// requested prefilter data.
+    ///
+    /// **NOTE:** For parsers that do not accept configuration when constructed
+    /// (e.g. a parser that accepts all updates of a certain type from a
+    /// specific program), the ID may be as simple as the fully-qualified type
+    /// name of the parser.  However, for parsers that produce a different
+    /// prefilter depending on some internal configuration, instances that
+    /// output differing prefilters _must_ output different IDs.
+    fn id(&self) -> Cow<'static, str>;
+
+    /// Filter data passed to Yellowstone to coarsely narrow down updates
+    /// to values parseable by this parser.
+    fn prefilter(&self) -> Prefilter;
+
+    /// Parse the given update into a parsed value.
+    fn parse(&self, value: &Self::Input) -> impl Future<Output = ParseResult<Self::Output>> + Send;
+}
+
+/// A parser that parses all relevant updates for a particular program ID.
+pub trait ProgramParser: Parser {
+    /// The program ID that this parser is associated with.
+    fn program_id(&self) -> Pubkey;
+}
+
+/// Helper trait for getting the ID of a parser.
+pub trait ParserId {
+    /// Get the ID of this parser, see [`Parser::id`].
+    fn id(&self) -> Cow<'static, str>;
+}
+
+impl ParserId for std::convert::Infallible {
+    #[inline]
+    fn id(&self) -> Cow<'static, str> { match *self {} }
+}
+
+impl<T: Parser> ParserId for T {
+    #[inline]
+    fn id(&self) -> Cow<'static, str> { Parser::id(self) }
+}
+
+/// Helper trait for getting the prefilter of a parser.
+pub trait GetPrefilter {
+    /// Get the prefilter of this parser, see [`Parser::prefilter`].
+    fn prefilter(&self) -> Prefilter;
+}
+
+impl GetPrefilter for std::convert::Infallible {
+    #[inline]
+    fn prefilter(&self) -> Prefilter { match *self {} }
+}
+
+impl<T: Parser> GetPrefilter for T {
+    #[inline]
+    fn prefilter(&self) -> Prefilter { Parser::prefilter(self) }
+}
+
+// TODO: why are so many fields on the prefilters and prefilter builder optional???
+/// A prefilter for narrowing down the updates that a parser will receive.
+#[derive(Debug, Default, Clone)]
+pub struct Prefilter {
+    /// Filters for account updates.
+    pub account: Option<AccountPrefilter>,
+    /// Filters for transaction updates.
+    pub transaction: Option<TransactionPrefilter>,
+    /// Filters for block meta updates.
+    pub block_meta: Option<BlockMetaPrefilter>,
+    /// Filters for block updates.
+    pub block: Option<BlockPrefilter>,
+    /// Filters for slot updates.
+    pub slot: Option<SlotPrefilter>,
+}
+
+fn merge_opt<T, F: FnOnce(&mut T, T)>(lhs: &mut Option<T>, rhs: Option<T>, f: F) {
+    match (lhs.as_mut(), rhs) {
+        (None, r) => *lhs = r,
+        (Some(_), None) => (),
+        (Some(l), Some(r)) => f(l, r),
+    }
+}
+
+impl Prefilter {
+    /// Create a new prefilter builder.
+    #[inline]
+    pub fn builder() -> PrefilterBuilder { PrefilterBuilder::default() }
+
+    /// Merge another prefilter into this one, producing a prefilter that
+    /// describes the union of the two.
+    pub fn merge(&mut self, other: Prefilter) {
+        let Self {
+            account,
+            transaction,
+            block_meta,
+            block,
+            slot,
+        } = self;
+        merge_opt(account, other.account, AccountPrefilter::merge);
+        merge_opt(transaction, other.transaction, TransactionPrefilter::merge);
+        merge_opt(block_meta, other.block_meta, BlockMetaPrefilter::merge);
+        merge_opt(block, other.block, BlockPrefilter::merge);
+        merge_opt(slot, other.slot, SlotPrefilter::merge);
+    }
+}
+
+impl FromIterator<Prefilter> for Prefilter {
+    fn from_iter<T: IntoIterator<Item = Prefilter>>(iter: T) -> Self {
+        let mut iter = iter.into_iter();
+        let Some(ret) = iter.next() else {
+            return Self::default();
+        };
+        iter.fold(ret, |mut l, r| {
+            l.merge(r);
+            l
+        })
+    }
+}
+
+/// A prefilter for matching accounts.
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct AccountPrefilter {
+    /// The accounts that this prefilter will match.
+    pub accounts: HashSet<Pubkey>,
+    /// The owners that this prefilter will match.
+    pub owners: HashSet<Pubkey>,
+}
+
+impl AccountPrefilter {
+    /// Merge another account prefilter into this one, producing a prefilter
+    /// that describes the union of the two.
+    pub fn merge(&mut self, other: AccountPrefilter) {
+        let Self { accounts, owners } = self;
+        accounts.extend(other.accounts);
+        owners.extend(other.owners);
+    }
+}
+
+/// A prefilter for matching transactions.
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct TransactionPrefilter {
+    /// The transaction **must** include at least **ONE** of these accounts. Otherwise, the transaction
+    ///  won't be retrieved.
+    pub accounts_include: HashSet<Pubkey>,
+    /// These accounts **must** be present in the transaction.
+    ///  That means if any of the accounts are not included in the transaction, the transaction
+    ///  won't be retrieved.
+    pub accounts_required: HashSet<Pubkey>,
+}
+
+impl TransactionPrefilter {
+    /// Merge another transaction prefilter into this one, producing a prefilter
+    /// that describes the union of the two.
+    pub fn merge(&mut self, other: TransactionPrefilter) {
+        let Self {
+            accounts_include,
+            accounts_required,
+        } = self;
+
+        accounts_include.extend(other.accounts_include);
+        accounts_required.extend(other.accounts_required);
+    }
+}
+
+/// A prefilter for matching block metadata updates.
+#[derive(Debug, Default, Clone, PartialEq, Copy)]
+pub struct BlockMetaPrefilter {}
+
+impl BlockMetaPrefilter {
+    /// Merge another block metadata prefilter into this one.
+    /// This function currently does nothing as the struct has no fields.
+    pub fn merge(_lhs: &mut Self, _rhs: Self) {}
+}
+
+/// A prefilter for matching block updates.
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct BlockPrefilter {
+    /// filter transactions and accounts that use any account from the list
+    pub accounts_include: HashSet<Pubkey>,
+    /// include all transactions
+    pub include_transactions: bool,
+    /// include all account updates
+    pub include_accounts: bool,
+    /// include all entries
+    pub include_entries: bool,
+}
+
+impl BlockPrefilter {
+    /// Merge another block prefilter into this one.
+    pub fn merge(&mut self, other: BlockPrefilter) {
+        let Self {
+            accounts_include,
+            include_transactions,
+            include_accounts,
+            include_entries,
+        } = self;
+
+        accounts_include.extend(other.accounts_include);
+        *include_accounts = other.include_accounts;
+        *include_transactions = other.include_transactions;
+        *include_entries = other.include_entries;
+    }
+}
+
+/// A prefilter for matching slot updates updates.
+#[derive(Debug, Default, Clone, PartialEq, Copy)]
+pub struct SlotPrefilter {}
+
+impl SlotPrefilter {
+    /// Merge another slot prefilter into this one.
+    /// This function currently does nothing as the struct has no fields.
+    pub fn merge(_lhs: &mut Self, _rhs: Self) {}
+}
+
+/// Helper macro for converting Vixen's [`Pubkey`] to a Solana ed25519 public
+/// key.
+///
+/// Invoking the macro with the name of a publicly-exported Solana `Pubkey`
+/// type (e.g. `pubkey_convert_helpers!(solana_sdk::pubkey::Pubkey);`) will
+/// define two functions:
+///
+/// - `pub(crate) fn into_vixen_pubkey(`<Solana Pubkey>`) -> yellowstone_vixen_core::Pubkey;`
+/// - `pub(crate) fn from_vixen_pubkey(yellowstone_vixen_core::Pubkey) -> <Solana Pubkey>;`
+///
+/// These can be used as a convenience for quickly converting between Solana
+/// public keys and their representation in Vixen.  Vixen does not use the
+/// built-in Solana `Pubkey` type, nor does it provide `From`/`Into` impls for
+/// it, to avoid creating an unnecessary dependency on any specific version of
+/// the full Solana SDK.
+#[macro_export]
+macro_rules! pubkey_convert_helpers {
+    ($ty:ty) => {
+        pub(crate) fn into_vixen_pubkey(value: $ty) -> $crate::Pubkey { value.to_bytes().into() }
+
+        pub(crate) fn from_vixen_pubkey(value: $crate::Pubkey) -> $ty { value.into_bytes().into() }
+    };
+}
+
+/// Helper type representing a Solana public key.
+///
+/// This type is functionally equivalent to the `Pubkey` type from the Solana
+/// SDK, and it can be trivially converted to or from one by passing the
+/// underlying `[u8; 32]` array.  Vixen uses this `Pubkey` type to avoid
+/// depending on the Solana SDK, as this can lead to version conflicts when
+/// working with Solana program crates.
+pub type Pubkey = KeyBytes<32>;
+
+/// Generic wrapper for a fixed-length array of cryptographic key bytes,
+/// convertible to or from a base58-encoded string.
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(transparent)]
+pub struct KeyBytes<const LEN: usize>(pub [u8; LEN]);
+
+impl<const LEN: usize> Debug for KeyBytes<LEN> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("KeyBytes")
+            .field(&bs58::encode(self.0).into_string())
+            .finish()
+    }
+}
+
+impl<const LEN: usize> fmt::Display for KeyBytes<LEN> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&bs58::encode(self.0).into_string())
+    }
+}
+
+impl<const LEN: usize> From<[u8; LEN]> for KeyBytes<LEN> {
+    #[inline]
+    fn from(value: [u8; LEN]) -> Self { Self(value) }
+}
+
+impl<const LEN: usize> From<KeyBytes<LEN>> for [u8; LEN] {
+    #[inline]
+    fn from(value: KeyBytes<LEN>) -> Self { value.0 }
+}
+
+impl<const LEN: usize> std::ops::Deref for KeyBytes<LEN> {
+    type Target = [u8; LEN];
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+
+impl<const LEN: usize> std::ops::DerefMut for KeyBytes<LEN> {
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+impl<const LEN: usize> AsRef<[u8; LEN]> for KeyBytes<LEN> {
+    fn as_ref(&self) -> &[u8; LEN] { self }
+}
+
+impl<const LEN: usize> AsMut<[u8; LEN]> for KeyBytes<LEN> {
+    fn as_mut(&mut self) -> &mut [u8; LEN] { self }
+}
+
+impl<const LEN: usize> std::borrow::Borrow<[u8; LEN]> for KeyBytes<LEN> {
+    fn borrow(&self) -> &[u8; LEN] { self }
+}
+
+impl<const LEN: usize> std::borrow::BorrowMut<[u8; LEN]> for KeyBytes<LEN> {
+    fn borrow_mut(&mut self) -> &mut [u8; LEN] { self }
+}
+
+impl<const LEN: usize> AsRef<[u8]> for KeyBytes<LEN> {
+    fn as_ref(&self) -> &[u8] { self.as_slice() }
+}
+
+impl<const LEN: usize> AsMut<[u8]> for KeyBytes<LEN> {
+    fn as_mut(&mut self) -> &mut [u8] { self.as_mut_slice() }
+}
+
+impl<const LEN: usize> std::borrow::Borrow<[u8]> for KeyBytes<LEN> {
+    fn borrow(&self) -> &[u8] { self.as_ref() }
+}
+
+impl<const LEN: usize> std::borrow::BorrowMut<[u8]> for KeyBytes<LEN> {
+    fn borrow_mut(&mut self) -> &mut [u8] { self.as_mut() }
+}
+
+type KeyFromSliceError = std::array::TryFromSliceError;
+
+impl<const LEN: usize> TryFrom<&[u8]> for KeyBytes<LEN> {
+    type Error = KeyFromSliceError;
+
+    #[inline]
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> { value.try_into().map(Self) }
+}
+
+impl<const LEN: usize> KeyBytes<LEN> {
+    /// Construct a new instance from the provided key bytes
+    #[must_use]
+    pub fn new(bytes: [u8; LEN]) -> Self { bytes.into() }
+
+    /// Return the public key bytes contained in this instance
+    #[must_use]
+    pub fn into_bytes(self) -> [u8; LEN] { self.into() }
+
+    /// Attempt to convert the provided byte slice to a new key byte array
+    ///
+    /// # Errors
+    /// This function returns an error if calling `KeyBytes::try_from(slice)`
+    /// returns an error.
+    pub fn try_from_ref<T: AsRef<[u8]>>(key: T) -> Result<Self, KeyFromSliceError> {
+        key.as_ref().try_into()
+    }
+
+    /// Compare the public key bytes contained in this array with the given byte
+    /// slice
+    pub fn equals_ref<T: AsRef<[u8]>>(&self, other: T) -> bool {
+        self.as_slice().eq(other.as_ref())
+    }
+}
+
+impl<const LEN: usize> BorshSerialize for KeyBytes<LEN> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        self.0.serialize(writer)
+    }
+}
+
+impl<const LEN: usize> BorshDeserialize for KeyBytes<LEN> {
+    fn deserialize_reader<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
+        let bytes = <[u8; LEN]>::deserialize_reader(reader)?;
+        Ok(Self(bytes))
+    }
+}
+
+/// An error that can occur when parsing a key from a base58 string.
+#[derive(Debug, Clone, Copy, thiserror::Error)]
+pub enum KeyFromStrError<const LEN: usize = 32> {
+    /// The string was not a valid base58 string.
+    #[error("Invalid base58 string")]
+    Bs58(#[from] bs58::decode::Error),
+    /// The parsed base58 data was not the correct length for a public key.
+    #[error("Invalid key length, must be {LEN} bytes")]
+    Len(#[from] std::array::TryFromSliceError),
+}
+
+impl<const LEN: usize> FromStr for KeyBytes<LEN> {
+    type Err = KeyFromStrError<LEN>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        bs58::decode(s)
+            .into_vec()?
+            .as_slice()
+            .try_into()
+            .map_err(Into::into)
+    }
+}
+
+impl<const LEN: usize> TryFrom<&str> for KeyBytes<LEN> {
+    type Error = KeyFromStrError<LEN>;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> { value.parse() }
+}
+
+impl<const LEN: usize> TryFrom<String> for KeyBytes<LEN> {
+    type Error = KeyFromStrError<LEN>;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> { value.parse() }
+}
+
+impl<const LEN: usize> TryFrom<Cow<'_, str>> for KeyBytes<LEN> {
+    type Error = KeyFromStrError<LEN>;
+
+    fn try_from(value: Cow<str>) -> Result<Self, Self::Error> { value.parse() }
+}
+
+/// An error that can occur when building a prefilter.
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum PrefilterError {
+    /// A value was already set for a field that can only be set once.
+    #[error("Value already given for field {0}")]
+    AlreadySet(&'static str),
+    /// An error occurred while parsing a public key as a [`Pubkey`].
+    #[error("Invalid pubkey {}", bs58::encode(.0).into_string())]
+    BadPubkey(Vec<u8>, std::array::TryFromSliceError),
+}
+
+/// A builder for constructing a prefilter.
+#[derive(Debug, Default)]
+#[must_use = "Consider calling .build() on this builder"]
+#[allow(clippy::struct_excessive_bools)]
+pub struct PrefilterBuilder {
+    error: Option<PrefilterError>,
+    slots: bool,
+    block_metas: bool,
+    /// Matching [`BlockPrefilter::accounts`]
+    block_accounts_include: Option<HashSet<Pubkey>>,
+    /// Matching [`BlockPrefilter::include_accounts`]
+    block_include_accounts: bool,
+    /// Matching [`BlockPrefilter::include_transactions`]
+    block_include_transactions: bool,
+    /// Matching [`BlockPrefilter::include_entries`]
+    block_include_entries: bool,
+    /// Including all accounts  
+    accounts_include_all: bool,
+    /// Matching [`AccountPrefilter::accounts`]
+    accounts: Option<HashSet<Pubkey>>,
+    /// Matching [`AccountPrefilter::account_owners`]
+    account_owners: Option<HashSet<Pubkey>>,
+    /// Matching [`TransactionPrefilter::accounts_include`]
+    transaction_accounts_include: Option<HashSet<Pubkey>>,
+    /// Matching [`TransactionPrefilter::accounts_required`]
+    transaction_accounts_required: Option<HashSet<Pubkey>>,
+}
+
+fn set_opt<T>(opt: &mut Option<T>, field: &'static str, val: T) -> Result<(), PrefilterError> {
+    if opt.is_some() {
+        return Err(PrefilterError::AlreadySet(field));
+    }
+
+    *opt = Some(val);
+    Ok(())
+}
+
+// TODO: if Solana ever adds Into<[u8; 32]> for Pubkey this can be simplified
+fn collect_pubkeys<I: IntoIterator>(it: I) -> Result<HashSet<Pubkey>, PrefilterError>
+where I::Item: AsRef<[u8]> {
+    it.into_iter()
+        .map(|p| {
+            let p = p.as_ref();
+            p.try_into()
+                .map_err(|e| PrefilterError::BadPubkey(p.to_vec(), e))
+        })
+        .collect()
+}
+
+impl PrefilterBuilder {
+    /// Build the prefilter from the given data.
+    ///
+    /// # Errors
+    /// Returns an error if any of the fields provided are invalid.
+    pub fn build(self) -> Result<Prefilter, PrefilterError> {
+        let PrefilterBuilder {
+            error,
+            accounts_include_all,
+            accounts,
+            account_owners,
+            slots,
+            block_metas,
+            block_accounts_include,
+            block_include_accounts,
+            block_include_entries,
+            block_include_transactions,
+            transaction_accounts_include,
+            transaction_accounts_required,
+        } = self;
+        if let Some(err) = error {
+            return Err(err);
+        }
+
+        let account = AccountPrefilter {
+            accounts: accounts.unwrap_or_default(),
+            owners: account_owners.unwrap_or_default(),
+        };
+
+        let transaction = TransactionPrefilter {
+            accounts_include: transaction_accounts_include.unwrap_or_default(),
+            accounts_required: transaction_accounts_required.unwrap_or_default(),
+        };
+
+        let block_meta = BlockMetaPrefilter {};
+
+        let block = BlockPrefilter {
+            accounts_include: block_accounts_include.unwrap_or_default(),
+            include_accounts: block_include_accounts,
+            include_transactions: block_include_transactions,
+            include_entries: block_include_entries,
+        };
+
+        let slot = SlotPrefilter {};
+
+        let account = if accounts_include_all {
+            Some(AccountPrefilter::default())
+        } else {
+            (account != AccountPrefilter::default()).then_some(account)
+        };
+
+        Ok(Prefilter {
+            account,
+            transaction: (transaction != TransactionPrefilter::default()).then_some(transaction),
+            block_meta: block_metas.then_some(block_meta),
+            block: (block != BlockPrefilter::default()).then_some(block),
+            slot: slots.then_some(slot),
+        })
+    }
+
+    fn mutate<F: FnOnce(&mut Self) -> Result<(), PrefilterError>>(mut self, f: F) -> Self {
+        if self.error.is_none() {
+            self.error = f(&mut self).err();
+        }
+
+        self
+    }
+
+    /// Set prefilter will request slot updates.
+    pub fn slots(self) -> Self {
+        self.mutate(|this| {
+            this.slots = true;
+            Ok(())
+        })
+    }
+
+    /// Set prefilter will request `block_metas` updates.
+    pub fn block_metas(self) -> Self {
+        self.mutate(|this| {
+            this.block_metas = true;
+            Ok(())
+        })
+    }
+
+    /// Set `accounts_include_all` filter
+    pub fn accounts_include_all(self) -> Self {
+        self.mutate(|this| {
+            this.accounts_include_all = true;
+            Ok(())
+        })
+    }
+
+    /// Set the accounts that this prefilter will match.
+    pub fn accounts<I: IntoIterator>(self, it: I) -> Self
+    where I::Item: AsRef<[u8]> {
+        self.mutate(|this| set_opt(&mut this.accounts, "accounts", collect_pubkeys(it)?))
+    }
+
+    /// Set the `account_owners` that this prefilter will match.
+    pub fn account_owners<I: IntoIterator>(self, it: I) -> Self
+    where I::Item: AsRef<[u8]> {
+        self.mutate(|this| {
+            set_opt(
+                &mut this.account_owners,
+                "account_owners",
+                collect_pubkeys(it)?,
+            )
+        })
+    }
+
+    /// Set the required accounts for this transaction prefilter.
+    ///  The accounts set here **must** be present in the transaction.
+    ///
+    /// **Note:** If the transaction does not include ALL of the accounts set here, the
+    /// transaction will not be retrieved.
+    pub fn transaction_accounts<I: IntoIterator>(self, it: I) -> Self
+    where I::Item: AsRef<[u8]> {
+        self.mutate(|this| {
+            set_opt(
+                &mut this.transaction_accounts_required,
+                "transaction_accounts_required",
+                collect_pubkeys(it)?,
+            )
+        })
+    }
+
+    /// Set the included accounts for this transaction prefilter.
+    ///
+    /// **Note:** If the transaction does not include at least ONE of the accounts set here, the
+    /// transaction will not be retrieved.
+    pub fn transaction_accounts_include<I: IntoIterator>(self, it: I) -> Self
+    where I::Item: AsRef<[u8]> {
+        self.mutate(|this| {
+            set_opt(
+                &mut this.transaction_accounts_include,
+                "transaction_accounts_include",
+                collect_pubkeys(it)?,
+            )
+        })
+    }
+
+    /// Set the included accounts for this block prefilter.
+    pub fn block_accounts_include<I: IntoIterator>(self, it: I) -> Self
+    where I::Item: AsRef<[u8]> {
+        self.mutate(|this| {
+            set_opt(
+                &mut this.block_accounts_include,
+                "block_accounts_include",
+                collect_pubkeys(it)?,
+            )
+        })
+    }
+
+    /// Set the `include_accounts` flag for this block prefilter.
+    pub fn block_include_accounts(self) -> Self {
+        self.mutate(|this| {
+            this.block_include_accounts = true;
+            Ok(())
+        })
+    }
+
+    /// Set the `include_transactions` flag for this block prefilter.
+    pub fn block_include_transactions(self) -> Self {
+        self.mutate(|this| {
+            this.block_include_transactions = true;
+            Ok(())
+        })
+    }
+
+    /// Set the `include_entries` flag for this block prefilter.
+    pub fn block_include_entries(self) -> Self {
+        self.mutate(|this| {
+            this.block_include_entries = true;
+            Ok(())
+        })
+    }
+}
+
+/// A collection of filters for a Vixen subscription.
+#[derive(Debug, Clone)]
+pub struct Filters {
+    /// Filters for each parser.
+    pub parsers_filters: HashMap<String, Prefilter>,
+}
+
+impl Filters {
+    /// Construct a new collection of filters.
+    #[inline]
+    #[must_use]
+    pub fn new(filters: HashMap<String, Prefilter>) -> Self {
+        Self {
+            parsers_filters: filters,
+        }
+    }
+}
+
+/// Type mirroring the `CommitmentLevel` enum in the `geyser` crate but serializable.
+/// Used to avoid need for custom deserialization logic.
+#[derive(Debug, Clone, Copy, Deserialize, clap::ValueEnum)]
+#[serde(rename_all = "lowercase")]
+pub enum CommitmentLevel {
+    /// Processed
+    Processed,
+    /// Confirmed
+    Confirmed,
+    /// Finalized
+    Finalized,
+}
+
+impl From<geyser::CommitmentLevel> for CommitmentLevel {
+    fn from(value: geyser::CommitmentLevel) -> Self {
+        match value {
+            geyser::CommitmentLevel::Processed => Self::Processed,
+            geyser::CommitmentLevel::Confirmed => Self::Confirmed,
+            geyser::CommitmentLevel::Finalized => Self::Finalized,
+        }
+    }
+}
+
+impl From<Filters> for SubscribeRequest {
+    fn from(value: Filters) -> Self {
+        SubscribeRequest {
+            accounts: value
+                .parsers_filters
+                .iter()
+                .filter_map(|(k, v)| {
+                    let v = v.account.as_ref()?;
+
+                    Some((k.clone(), SubscribeRequestFilterAccounts {
+                        account: v.accounts.iter().map(ToString::to_string).collect(),
+                        owner: v.owners.iter().map(ToString::to_string).collect(),
+                        // TODO: probably a good thing to look into
+                        filters: vec![],
+                        // We receive all accounts updates
+                        nonempty_txn_signature: None,
+                    }))
+                })
+                .collect(),
+            slots: value
+                .parsers_filters
+                .iter()
+                .filter_map(|(k, v)| {
+                    v.slot?;
+                    Some((k.clone(), SubscribeRequestFilterSlots {
+                        filter_by_commitment: Some(true),
+                        interslot_updates: None,
+                    }))
+                })
+                .collect(),
+            transactions: value
+                .parsers_filters
+                .iter()
+                .filter_map(|(k, v)| {
+                    let v = v.transaction.as_ref()?;
+
+                    Some((k.clone(), SubscribeRequestFilterTransactions {
+                        vote: None,
+                        // TODO: make this configurable
+                        failed: Some(false),
+                        signature: None,
+                        account_include: v
+                            .accounts_include
+                            .iter()
+                            .map(ToString::to_string)
+                            .collect(),
+                        account_exclude: [].into_iter().collect(),
+                        account_required: v
+                            .accounts_required
+                            .iter()
+                            .map(ToString::to_string)
+                            .collect(),
+                    }))
+                })
+                .collect(),
+            transactions_status: [].into_iter().collect(),
+            blocks: value
+                .parsers_filters
+                .iter()
+                .filter_map(|(k, v)| {
+                    let v = v.block.as_ref()?;
+
+                    Some((k.clone(), SubscribeRequestFilterBlocks {
+                        account_include: v
+                            .accounts_include
+                            .iter()
+                            .map(ToString::to_string)
+                            .collect(),
+                        include_transactions: Some(v.include_transactions),
+                        include_accounts: Some(v.include_accounts),
+                        include_entries: Some(v.include_entries),
+                    }))
+                })
+                .collect(),
+            blocks_meta: value
+                .parsers_filters
+                .iter()
+                .filter_map(|(k, v)| {
+                    v.block_meta?;
+                    Some((k.clone(), SubscribeRequestFilterBlocksMeta {}))
+                })
+                .collect(),
+            entry: [].into_iter().collect(),
+            commitment: None,
+            accounts_data_slice: vec![],
+            ping: None,
+            from_slot: None,
+        }
+    }
+}
