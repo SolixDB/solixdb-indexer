@@ -6,8 +6,9 @@ resolver = "2"
 [workspace.package]
 edition = "2021"
 license = "MIT"
-version = "0.1.0"
+version = "0.6.0"
 repository = "https://github.com/priyanshpatel18/transaction-parser"
+publish = false
 
 [workspace.dependencies]
 # Core Utilities
@@ -67,7 +68,11 @@ strum_macros = "0.27"
 # Internal
 yellowstone-vixen-core = { path = "crates/core", version = "0.6.0" }
 yellowstone-vixen-proto = { path = "crates/proto", version = "0.6.0" }
+yellowstone-vixen-pumpfun-parser = { path = "crates/pumpfun-parser", version = "0.6.0" }
 yellowstone-vixen-raydium-amm-v4-parser = { path = "crates/raydium-amm-v4-parser", version = "0.6.0" }
+yellowstone-vixen-raydium-clmm-parser = { path = "crates/raydium-clmm-parser", version = "0.6.0" }
+yellowstone-vixen-raydium-cpmm-parser = { path = "crates/raydium-cpmm-parser", version = "0.6.0" }
+yellowstone-vixen-raydium-launchpad-parser = { path = "crates/raydium-launchpad-parser", version = "0.6.0" }
 
 # External
 bs58 = "0.5.1"
@@ -136,4 +141,8 @@ tracing-subscriber.workspace = true
 yellowstone-grpc-proto.workspace = true
 yellowstone-vixen-core.workspace = true
 yellowstone-vixen-proto.workspace = true
+yellowstone-vixen-pumpfun-parser.workspace = true
 yellowstone-vixen-raydium-amm-v4-parser.workspace = true
+yellowstone-vixen-raydium-clmm-parser.workspace = true
+yellowstone-vixen-raydium-cpmm-parser.workspace = true
+yellowstone-vixen-raydium-launchpad-parser.workspace = true
