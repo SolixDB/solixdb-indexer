@@ -107,15 +107,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Starting data fetch from Old Faithful...");
     let start_time = Instant::now();
 
-    // Clone for final summary before moving into Arc
-    let multi_parser_summary = multi_parser.clone();
+    // Create Arc for shared access during processing and summary
+    let multi_parser = Arc::new(multi_parser);
+    let multi_parser_summary = Arc::clone(&multi_parser);
 
     let block_handler = move |_thread_id: usize, _block: BlockData| {
         async move { Ok::<(), Box<dyn std::error::Error + Send + Sync>>(()) }.boxed()
     };
 
     let transaction_handler = {
-        let multi_parser = Arc::new(multi_parser);
+        let multi_parser = Arc::clone(&multi_parser);
 
         move |_thread_id: usize, tx: TransactionData| {
             let multi_parser = multi_parser.clone();
