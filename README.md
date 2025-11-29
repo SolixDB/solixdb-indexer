@@ -1,26 +1,32 @@
-# Jetstreamer Old Faithful with Raydium Parser
+# Jetstreamer Old Faithful Multi-Parser Example
 
-Example demonstrating how to fetch historical Solana blockchain data from Old Faithful and parse Raydium AMM v4 program instructions using Yellowstone Vixen parsers.
+Example demonstrating how to fetch historical Solana blockchain data from Old Faithful and parse multiple program instructions simultaneously using Yellowstone Vixen parsers.
 
 ## Overview
 
-This example shows how to stream historical Solana blocks and transactions from [Old Faithful](https://old-faithful.net/), filter for specific program interactions, and parse their instructions into structured data. It focuses on the Raydium AMM v4 program (`675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8`) and demonstrates how to:
+This example shows how to stream historical Solana blocks and transactions from [Old Faithful](https://old-faithful.net/), filter for multiple program interactions simultaneously, and parse their instructions into structured data. It demonstrates a scalable multi-parser architecture that can monitor and parse transactions from any number of Solana programs concurrently.
 
-- Stream historical blockchain data without running a full validator
-- Filter transactions by program ID
-- Resolve account keys from address lookup tables (ALTs)
-- Parse program instructions into typed structures using Yellowstone Vixen parsers
+The example includes parsers for popular Solana programs including:
+- **Pumpfun** - Token launch platform
+- **Pumpfun Swaps** - Swap functionality
+- **Raydium** - AMM V4, CLMM, CPMM, and Launchpad
+- **Jupiter** - Aggregated swaps
+- **Meteora** - AMM launchpad
+- **Moonshot** - Launchpad platform
+- **Orca Whirlpool** - Concentrated liquidity pools
 
-## Features
+## Key Features
 
-- Stream blocks, transactions, entries, and rewards in real-time
-- Filter transactions by target program ID
-- Handle both legacy and versioned transactions (v0 with ALTs)
-- Parse Raydium AMM v4 instructions into structured data
-- Track processing statistics and program-specific transaction counts
-- Graceful error handling for invalid account indices
-- Configurable slot ranges and threading
-- Built-in logging and progress tracking
+- **Multi-Parser Architecture**: Monitor and parse multiple programs simultaneously with a single stream
+- **Scalable Design**: Easily add or remove parsers for different programs
+- **Transaction Statistics**: Track parsing counts per program with atomic counters
+- **Stream historical blockchain data** without running a full validator
+- **Filter transactions** by multiple program IDs concurrently
+- **Resolve account keys** from address lookup tables (ALTs)
+- **Parse program instructions** into typed structures using Yellowstone Vixen parsers
+- **Graceful error handling** for invalid account indices and parsing failures
+- **Configurable slot ranges** and threading
+- **Built-in logging** and progress tracking
 
 ## Prerequisites
 
@@ -85,7 +91,7 @@ Run the example with default configuration:
 cargo run --release
 ```
 
-The example will fetch blocks and transactions from slots 345000000 to 345000001 on Solana mainnet, filtering for Raydium AMM v4 program interactions.
+The example will fetch blocks and transactions from slots 345000000 to 345000100 on Solana mainnet, filtering for all configured program interactions.
 
 ### Configuration
 
@@ -93,38 +99,97 @@ Modify the configuration variables in `main.rs` to customize behavior:
 
 ```rust
 let slot_start = 345000000;      // Starting slot
-let slot_end = 345000001;        // Ending slot (exclusive)
-let threads = 10;                // Number of processing threads
+let slot_end = 345000100;        // Ending slot (exclusive)
+let threads = 1;                 // Number of processing threads
 let network = "mainnet";         // Network: "mainnet", "testnet", or "devnet"
 let compact_index_base_url = "https://files.old-faithful.net";
 let network_capacity_mb = 100_000; // Network buffer capacity
+```
 
-// Target program to filter
-let raydium_program_id = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
-    .parse::<Address>()
-    .expect("Invalid program address");
+### Multi-Parser Setup
+
+The multi-parser architecture allows you to monitor multiple programs simultaneously:
+
+```rust
+let multi_parser = MultiParser::new()
+    .add_parser(
+        "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+        "Pumpfun",
+        PumpfunIxParser,
+    )
+    .add_parser(
+        "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+        "Raydium AMM V4",
+        RaydiumAmmV4IxParser,
+    )
+    .add_parser(
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "Jupiter Swaps",
+        JupiterSwapIxParser,
+    );
+    // Add more parsers as needed
 ```
 
 ### How It Works
 
 1. **Block Streaming**: The firehose interface streams blocks from Old Faithful's historical archive
-2. **Transaction Filtering**: Each transaction is checked for instructions that invoke the target program
+2. **Transaction Processing**: Each transaction is examined for instructions from any monitored program
 3. **Account Resolution**: Account keys are resolved from both static keys and address lookup tables (ALTs)
-4. **Instruction Parsing**: Raydium instructions are parsed using Yellowstone Vixen's typed parsers
-5. **Statistics Tracking**: Counters track total transactions processed and program-specific matches
+4. **Multi-Parser Routing**: Instructions are automatically routed to the appropriate parser based on program ID
+5. **Instruction Parsing**: Each parser converts raw instruction data into typed structures
+6. **Statistics Tracking**: Atomic counters track parsing counts per program
+7. **Summary Reporting**: Final statistics show transaction counts for each parser
 
 ### What Gets Logged
 
-- **Blocks**: Slot number, blockhash, transaction count, skipped slots
-- **Transactions**: Signature, slot, index, vote status (all transactions)
-- **Raydium Matches**: Transactions containing Raydium program instructions
-- **Parsed Instructions**: Structured data from successfully parsed Raydium instructions
-- **Errors**: Invalid account indices, parsing failures, firehose errors
-- **Progress**: Processing updates every 100 transactions
-- **Stats**: Periodic statistics every 1000 slots
-- **Final Summary**: Total blocks, transactions, and Raydium matches
+- **Configuration**: Active parsers and their program IDs at startup
+- **Progress Updates**: Processing statistics every 10,000 slots
+- **Parsed Instructions**: Successfully parsed instruction data with parser name, signature, and slot
+- **Parse Errors**: Failed parsing attempts with error details
+- **Firehose Errors**: Network or streaming errors with context
+- **Final Summary**: Transaction counts per parser at completion
 
 ## Understanding the Code
+
+### Multi-Parser Architecture
+
+The `MultiParser` struct manages multiple parsers efficiently:
+
+```rust
+pub struct MultiParser {
+    parsers: HashMap<Address, ParserEntry>,
+}
+
+struct ParserEntry {
+    name: &'static str,
+    parser: Arc<dyn ParserTrait>,
+    counter: AtomicU64,
+}
+```
+
+Key features:
+- **HashMap lookup**: O(1) parser retrieval by program ID
+- **Arc-wrapped parsers**: Safe sharing across async tasks
+- **Atomic counters**: Thread-safe transaction counting per parser
+- **Dynamic dispatch**: Generic parser trait for any Yellowstone Vixen parser
+
+### Parser Trait
+
+The `ParserTrait` provides a unified interface for all parsers:
+
+```rust
+trait ParserTrait: Send + Sync {
+    fn parse_and_log<'a>(
+        &'a self,
+        instruction: &'a InstructionUpdate,
+        parser_name: &'a str,
+        signature: &'a str,
+        slot: u64,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ()> + Send + 'a>>;
+}
+```
+
+This trait is automatically implemented for any Yellowstone Vixen parser with a debuggable output type.
 
 ### Account Resolution
 
@@ -133,32 +198,36 @@ Solana transactions can use Address Lookup Tables (ALTs) to compress account lis
 - **Legacy transactions**: Use only static account keys
 - **V0 transactions**: Combine static keys with dynamically loaded addresses from ALTs
 
-### Instruction Filtering
-
-The code filters instructions by:
-1. Extracting the program ID index from each instruction
-2. Resolving the actual program ID from the full account list
-3. Comparing against the target program ID (Raydium)
-
-### Parsing Flow
+### Transaction Processing Flow
 
 ```rust
 // 1. Build complete account list (static + ALT addresses)
 let all_accounts = build_full_account_list(...);
 
-// 2. Check if transaction uses target program
-let uses_raydium = instructions.iter()
-    .filter_map(|ix| all_accounts.get(ix.program_id_index as usize))
-    .any(|program_id| *program_id == raydium_program_id);
-
-// 3. Parse matching instructions
-let instruction_update = InstructionUpdate {
-    program: program_id.to_bytes().into(),
-    data: ix.data.clone(),
-    accounts: resolved_accounts,
-    ...
-};
-raydium_parser.parse(&instruction_update).await?;
+// 2. Process each instruction in the transaction
+for ix in instructions {
+    let program_id = all_accounts[ix.program_id_index];
+    
+    // 3. Check if we have a parser for this program
+    if !multi_parser.has_parser(&program_id) {
+        continue;
+    }
+    
+    // 4. Resolve instruction accounts
+    let resolved_accounts: Vec<_> = ix.accounts
+        .iter()
+        .filter_map(|idx| all_accounts.get(*idx as usize))
+        .map(|addr| addr.to_bytes().into())
+        .collect();
+    
+    // 5. Parse and log the instruction
+    multi_parser.parse_instruction(
+        &program_id,
+        &instruction_update,
+        &signature,
+        slot,
+    ).await;
+}
 ```
 
 ## Epoch Feature Availability
@@ -177,15 +246,69 @@ The firehose interface works with all epochs, including those incompatible with 
 ## Output Example
 
 ```
-2025-11-28T20:57:36.203867Z  INFO Configuration loaded slot_start=345000000 slot_end=345000001 threads=1 network="mainnet" target_program=675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8
-2025-11-28T20:57:36.203993Z  INFO Starting data fetch from Old Faithful...
+2025-11-29T08:25:38.316056Z  INFO Starting Multi-Parser Transaction Logger
+2025-11-29T08:25:38.316300Z  INFO Active parsers:
+2025-11-29T08:25:38.316335Z  INFO   - Pumpfun (6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P)
+2025-11-29T08:25:38.316343Z  INFO   - Moonshot Launchpad (MoonCVVNZFSYkqNXP6bxHLPL6QQJiMagDL3qcqUQTrG)
+2025-11-29T08:25:38.316350Z  INFO   - Orca Whirlpool Launchpad (whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc)
+2025-11-29T08:25:38.316358Z  INFO   - Raydium CLMM (CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK)
+2025-11-29T08:25:38.316364Z  INFO   - Raydium AMM V4 (675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8)
+2025-11-29T08:25:38.316371Z  INFO   - Jupiter Swaps (JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4)
+2025-11-29T08:25:38.316378Z  INFO   - Raydium CPMM (CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C)
+2025-11-29T08:25:38.316384Z  INFO   - Pumpfun Swaps (pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA)
+2025-11-29T08:25:38.316391Z  INFO   - Raydium Launchpad (LanMV9sAd7wArD4vJFi2qDdfnVhFxYSUg6eADduJ3uj)
+2025-11-29T08:25:38.316398Z  INFO   - Meteora AMM Launchpad (cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG)
+2025-11-29T08:25:38.316417Z  INFO Configuration loaded slot_start=345000000 slot_end=345000100 threads=1 network="mainnet" parser_count=10
+2025-11-29T08:25:38.316477Z  INFO Starting data fetch from Old Faithful...
+2025-11-29T08:25:38.319682Z  INFO starting firehose...
 ...
-2025-11-28T20:58:17.459413Z  INFO Raydium parsed parsed=SwapBaseIn(SwapBaseIn { token_program: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA, amm: 5ja175UxNhHthD5AqubW3YaRBByY4mzmUB99ct8AXqot, amm_authority: 5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1, amm_open_orders: AKbXbb1ZsWTQRgXvjYrEEda8zeENMu8XBvzpcyeAYf9g, amm_target_orders: Some(4WzsKLVYBhesdYVtEi8Q58uYGGjXXgXgzshJCEgE15f7), pool_coin_token_account: J3vvjqCRp3HzPt299VA7Vry2U6HDDGoGNyTyCXXapiK3, pool_pc_token_account: 4yD3S8CYYSFRC8aXKgZFcPEaF7Ln38LbDPDktXAmaCuP, serum_program: srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX, serum_market: HR1mJWDJz5AYoA1tHVdNdgTkojmX58UuYPtqRRdbbWjy, serum_bids: 3pVpFnYEpcyG6Yz1ZT9Hg1iauHtPzKrF1LaSQCrCByTt, serum_asks: 4wrbDU5pLHP94HYaS2JqDHAsdwD5Y7tjtUoAkFnMaZsc, serum_event_queue: 5eRFjEnCjiTWvZpfLngmCVBu2iBVyhVrbSDQWrSQQ4zo, serum_coin_vault_account: gw1P3B779yv7hG4Xs4NCS9JJioLGvbbDMRqYZiKS38F, serum_pc_vault_account: BoBo3i1uvFgkFn3iT4cBCBvmVm7PKmGM1ABkvgEstuD, serum_vault_signer: 9QBJ6wb9RbrweM1HuJCENN8dp3KRYDSBHnizbWg3Xjxz, uer_source_token_account: ExmCphHCbsCgbgPHPtsgZ8M1z5o8nZbiU26d4Siu6eZX, uer_destination_token_account: 2wMGLtMQMJN9DR1QPHasAUgWf48XXH5Hv3dwc7qUWtTj, user_source_owner: 84jMuw5srv5EQBdEUiDfrB9WKnxpyCizqvX3wWVj3cxR }, SwapBaseInInstructionArgs { amount_in: 9345425, minimum_amount_out: 1121 })
+2025-11-29T08:26:29.456893Z  INFO Instruction parsed parser="Raydium AMM V4" signature="5LLzfmpEoZuSsFGzzxT8u4TkXMqkV1Rn3QJMpmr6UzyRFocXU7KBZs64PDHNk6muksc19AxPyKVxuNeiuxtinK2A" slot=345000099 parsed=SwapBaseIn(SwapBaseIn { ... })
+2025-11-29T08:26:29.458379Z  INFO Instruction parsed parser="Pumpfun Swaps" signature="4aVixJupzQXWHTUN7xCt9ZwTBikyxeWEa1DVSAdjspQkp2GfvAj6SZrqzfEh1LjSD5Pd2TXDPaWdqTnj3FgTvXJg" slot=345000099 parsed=Sell(Sell { ... })
 ...
-2025-11-28T20:58:17.461731Z  INFO Fetch completed successfully slot_start=345000000 slot_end=345000001 total_blocks=1 total_transactions=1707 processing_time_secs=8.6523295
-2025-11-28T20:58:17.461737Z  INFO Raydium program transactions found: 30
-2025-11-28T20:58:17.461740Z  INFO SUCCESS — Old Faithful data fetch is working!
+2025-11-29T08:26:29.459268Z  INFO Processing completed slot_range="345000000-345000100" duration_secs=51.142629416
+2025-11-29T08:26:29.459274Z  INFO Transaction counts by parser:
+2025-11-29T08:26:29.459277Z  INFO   - Pumpfun: 1357 transactions
+2025-11-29T08:26:29.459280Z  INFO   - Moonshot Launchpad: 1 transactions
+2025-11-29T08:26:29.459283Z  INFO   - Orca Whirlpool Launchpad: 78 transactions
+2025-11-29T08:26:29.459285Z  INFO   - Raydium CLMM: 1489 transactions
+2025-11-29T08:26:29.459287Z  INFO   - Raydium AMM V4: 5259 transactions
+2025-11-29T08:26:29.459289Z  INFO   - Jupiter Swaps: 2700 transactions
+2025-11-29T08:26:29.459291Z  INFO   - Raydium CPMM: 177 transactions
+2025-11-29T08:26:29.459294Z  INFO   - Pumpfun Swaps: 5330 transactions
+2025-11-29T08:26:29.459297Z  INFO   - Raydium Launchpad: 9 transactions
+2025-11-29T08:26:29.459299Z  INFO   - Meteora AMM Launchpad: 15 transactions
 ```
+
+## Adding New Parsers
+
+To add a new program parser:
+
+1. **Add the parser dependency** to `Cargo.toml`:
+```toml
+yellowstone-vixen-your-program-parser = "0.1.0"
+```
+
+2. **Import the parser** in `main.rs`:
+```rust
+use yellowstone_vixen_your_program_parser::instructions_parser::InstructionParser as YourProgramIxParser;
+```
+
+3. **Register with MultiParser**:
+```rust
+let multi_parser = MultiParser::new()
+    // ... existing parsers ...
+    .add_parser(
+        "YOUR_PROGRAM_ID_HERE",
+        "Your Program Name",
+        YourProgramIxParser,
+    );
+```
+
+That's it! The multi-parser will automatically route and parse instructions from your new program.
+
+## Removing Parsers
+
+Simply comment out or remove the `.add_parser()` call for any parser you don't need. The system will skip instructions from that program without any performance impact.
 
 ## Troubleshooting
 
@@ -195,34 +318,25 @@ The firehose interface works with all epochs, including those incompatible with 
 
 **Invalid account index errors**: These occur when instruction account indices exceed the available account list. The code logs these errors and continues processing.
 
-**Parsing errors**: If Raydium instructions fail to parse, the error is logged with details. This can happen with malformed instruction data or unsupported instruction types.
+**Parsing errors**: If instructions fail to parse, the error is logged with parser name and details. This can happen with malformed instruction data or unsupported instruction types.
 
-**Slot not found**: Some slots may be skipped or unavailable. These are logged as "Skipped slot" messages.
+**Slot not found**: Some slots may be skipped or unavailable. These are logged as "Firehose error" messages.
 
-## Extending to Other Programs
+**Parser not found**: If you see instructions being skipped, verify that the program ID is correctly registered in the multi-parser setup.
 
-To filter and parse different programs:
+## Performance Considerations
 
-1. Change the target program ID:
-```rust
-let target_program_id = "YOUR_PROGRAM_ID_HERE"
-    .parse::<Address>()
-    .expect("Invalid program address");
-```
-
-2. Use the appropriate Yellowstone Vixen parser:
-```rust
-use yellowstone_vixen_your_program_parser::instructions_parser::InstructionParser;
-let parser = Arc::new(InstructionParser);
-```
-
-3. Update the parsed instruction handling in the transaction handler
+- **Memory Usage**: Each parser maintains atomic counters. With 10 parsers, overhead is minimal (<1KB)
+- **Lookup Performance**: HashMap lookups are O(1), making program ID matching very fast
+- **Thread Safety**: All parsers are thread-safe and can be used across multiple processing threads
+- **Async Processing**: Parsing happens asynchronously, allowing concurrent processing of multiple instructions
 
 ## Learn More
 
 - [Old Faithful Archive](https://old-faithful.net/)
 - [Yellowstone Vixen Parsers](https://github.com/rpcpool/yellowstone-vixen)
 - [Raydium AMM Documentation](https://docs.raydium.io/)
+- [Jupiter Aggregator](https://jup.ag/)
 - [Solana Address Lookup Tables](https://docs.solana.com/developing/lookup-tables)
 - [Jetstreamer Documentation](https://docs.rs/jetstreamer-firehose)
 
