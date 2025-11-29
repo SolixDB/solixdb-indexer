@@ -7,10 +7,15 @@ use std::time::Instant;
 use tracing::{error, info};
 use yellowstone_vixen_core::{instruction::InstructionUpdate};
 use yellowstone_vixen_pumpfun_parser::instructions_parser::InstructionParser as PumpfunIxParser;
+use yellowstone_vixen_pump_swaps_parser::instructions_parser::InstructionParser as PumpSwapsIxParser;
 use yellowstone_vixen_raydium_amm_v4_parser::instructions_parser::InstructionParser as RaydiumAmmV4IxParser;
 use yellowstone_vixen_raydium_clmm_parser::instructions_parser::InstructionParser as RaydiumClmmIxParser;
 use yellowstone_vixen_raydium_cpmm_parser::instructions_parser::InstructionParser as RaydiumCpmmIxParser;
 use yellowstone_vixen_raydium_launchpad_parser::instructions_parser::InstructionParser as RaydiumLaunchpadIxParser;
+use yellowstone_vixen_jupiter_swap_parser::instructions_parser::InstructionParser as JupiterSwapIxParser;
+use yellowstone_vixen_meteora_amm_parser::instructions_parser::InstructionParser as MeteoraAmmIxParser;
+use yellowstone_vixen_moonshot_parser::instructions_parser::InstructionParser as MoonshotIxParser;
+use yellowstone_vixen_orca_whirlpool_parser::instructions_parser::InstructionParser as OrcaWhirlpoolIxParser;
 
 mod multi_parser;
 use multi_parser::MultiParser;
@@ -46,7 +51,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Configuration
     let slot_start = 345000000;
-    let slot_end = 345000001;
+    let slot_end = 345000100;
     let threads = 1;
     let network = "mainnet";
     let compact_index_base_url = "https://files.old-faithful.net";
@@ -58,6 +63,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
             "Pumpfun",
             PumpfunIxParser,
+        )
+        .add_parser(
+            "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+            "Pumpfun Swaps",
+            PumpSwapsIxParser,
         )
         .add_parser(
             "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
@@ -78,6 +88,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "LanMV9sAd7wArD4vJFi2qDdfnVhFxYSUg6eADduJ3uj",
             "Raydium Launchpad",
             RaydiumLaunchpadIxParser,
+        )
+        .add_parser(
+            "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+            "Jupiter Swaps",
+            JupiterSwapIxParser,
+        )
+        .add_parser(
+            "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+            "Meteora AMM Launchpad",
+            MeteoraAmmIxParser,
+        )
+        .add_parser(
+            "MoonCVVNZFSYkqNXP6bxHLPL6QQJiMagDL3qcqUQTrG",
+            "Moonshot Launchpad",
+            MoonshotIxParser,
+        )
+        .add_parser(
+            "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+            "Orca Whirlpool Launchpad",
+            OrcaWhirlpoolIxParser,
         );
 
     // Log active parsers
