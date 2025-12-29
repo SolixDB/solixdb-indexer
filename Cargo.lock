@@ -1417,6 +1417,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "cityhash-rs"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "93a719913643003b84bd13022b4b7e703c09342cd03b679c4641c7d2e50dc34d"
+
+[[package]]
 name = "clang-sys"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1491,6 +1497,7 @@ dependencies = [
  "bnum",
  "bstr",
  "bytes",
+ "cityhash-rs",
  "clickhouse-macros",
  "clickhouse-types",
  "futures-channel",
@@ -1498,6 +1505,7 @@ dependencies = [
  "http-body-util",
  "hyper 1.7.0",
  "hyper-util",
+ "lz4_flex",
  "polonius-the-crab",
  "serde",
  "thiserror 2.0.17",
@@ -2963,6 +2971,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc0fef456e4baa96da950455cd02c081ca953b141298e41db3fc7e36b1da849c"
 
 [[package]]
+name = "hex"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+
+[[package]]
 name = "higher-kinded-types"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4100,6 +4114,12 @@ dependencies = [
  "cc",
  "libc",
 ]
+
+[[package]]
+name = "lz4_flex"
+version = "0.11.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08ab2867e3eeeca90e844d1940eab391c9dc5228783db2ed999acbc0a9ed375a"
 
 [[package]]
 name = "macro_rules_attribute"
@@ -12644,11 +12664,14 @@ dependencies = [
 name = "transaction-parser"
 version = "0.6.0"
 dependencies = [
+ "base64 0.22.1",
  "borsh 1.5.7",
  "bs58",
  "clap 4.5.53",
+ "clickhouse",
  "dashmap 6.1.0",
  "futures-util",
+ "hex",
  "jetstreamer-firehose",
  "jetstreamer-plugin",
  "jetstreamer-utils",
@@ -12660,6 +12683,7 @@ dependencies = [
  "prost-types 0.13.5",
  "protobuf-src",
  "serde",
+ "serde_json",
  "solana-account-info 2.3.0",
  "solana-address 2.0.0",
  "solana-cpi 2.2.1",
@@ -12696,6 +12720,7 @@ dependencies = [
  "yellowstone-vixen-raydium-clmm-parser",
  "yellowstone-vixen-raydium-cpmm-parser",
  "yellowstone-vixen-raydium-launchpad-parser",
+ "zstd",
 ]
 
 [[package]]
