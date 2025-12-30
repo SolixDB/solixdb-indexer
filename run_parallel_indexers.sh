@@ -5,7 +5,7 @@
 # This script automatically splits slot ranges across multiple processes.
 # You only need to specify the total range - the script handles distribution!
 #
-# Usage: ./run_parallel_indexers.sh <start_slot> <end_slot> <num_processes> [threads_per_process] [clickhouse_url]
+# Usage: ./run_parallel_indexers.sh <start_slot> <end_slot> <num_processes> [threads_per_process] [clickhouse_url] [clear_db_on_start]
 # 
 # Examples:
 #   ./run_parallel_indexers.sh 377107390 377107490 4
@@ -13,6 +13,10 @@
 #
 #   ./run_parallel_indexers.sh 377107390 377107490 4 8 http://clickhouse:8123
 #   # 4 processes, 8 threads each, custom ClickHouse URL
+#
+#   ./run_parallel_indexers.sh 377107390 377107490 4 8 http://myuser:mystrongpassword@localhost:8123 true
+#   # All processes will clear the database on start. Use "false" to prevent clearing.
+#   # If omitted, first process clears DB (true), others don't (false)
 #
 # Note: Environment variables (SLOT_START, SLOT_END, etc.) override config.toml values
 #       Each process gets its own slot range automatically calculated
@@ -47,6 +51,9 @@ else
     # Don't set it - let config.toml or program defaults handle it
     CLICKHOUSE_URL=""
 fi
+
+# Clear DB on start: use argument if provided, otherwise use default behavior (first=true, others=false)
+CLEAR_DB_OVERRIDE=${6:-""}
 
 # Validate inputs
 if ! [[ "$START_SLOT" =~ ^[0-9]+$ ]]; then
@@ -83,6 +90,11 @@ if [ -n "$CLICKHOUSE_URL" ]; then
     echo "  ClickHouse URL: $CLICKHOUSE_URL (overrides config.toml)"
 else
     echo "  ClickHouse URL: (will use config.toml or default)"
+fi
+if [ -n "$CLEAR_DB_OVERRIDE" ]; then
+    echo "  Clear DB on start: $CLEAR_DB_OVERRIDE (for all processes)"
+else
+    echo "  Clear DB on start: true (first process only), false (others)"
 fi
 echo ""
 echo -e "${YELLOW}Automatic Slot Distribution:${NC}"
@@ -124,11 +136,17 @@ for i in $(seq 1 $NUM_PROCESSES); do
     PROCESS_START=$CURRENT_SLOT
     PROCESS_END=$((CURRENT_SLOT + PROCESS_SLOTS))
     
-    # First process clears DB, others don't
-    if [ $i -eq 1 ]; then
-        CLEAR_DB="true"
+    # Determine CLEAR_DB_ON_START value
+    if [ -n "$CLEAR_DB_OVERRIDE" ]; then
+        # Use override value for all processes
+        CLEAR_DB=$CLEAR_DB_OVERRIDE
     else
-        CLEAR_DB="false"
+        # Default behavior: first process clears DB, others don't
+        if [ $i -eq 1 ]; then
+            CLEAR_DB="true"
+        else
+            CLEAR_DB="false"
+        fi
     fi
     
     LOG_FILE="logs/indexer-${i}.log"
