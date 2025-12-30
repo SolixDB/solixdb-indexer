@@ -36,12 +36,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             slot_start, slot_end
         ).into());
     }
-
+    
     let threads = std::env::var("THREADS")
         .ok()
         .and_then(|s| s.parse().ok())
         .unwrap_or(1);
-
+    
     if threads == 0 {
         return Err("THREADS must be greater than 0".into());
     }
@@ -60,7 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .ok()
         .map(|s| s == "true")
         .unwrap_or(false);
-
+    
     let storage = if clear_db_on_start {
         tracing::info!("Clearing database and recreating tables...");
         Arc::new(ClickHouseStorage::new_with_clear(&clickhouse_url).await
@@ -161,15 +161,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 slot_end,
                 &metrics,
                 threads,
-            );
+    );
 
             // Print storage stats
             if let Err(e) = storage.get_storage_stats().await {
                 tracing::error!("Failed to get storage stats: {:?}", e);
-            }
+    }
 
             Ok(())
         }
-        Err((e, slot)) => Err(format!("Error at slot {}: {:?}", slot, e).into()),
+        Err((e, slot)) => {
+            // Flush pending batches even on error
+            tracing::warn!("Error at slot {}: {:?}", slot, e);
+            tracing::info!("Flushing pending batches before exit...");
+            if let Err(flush_err) = storage.flush_all().await {
+                tracing::error!("Failed to flush batches on error: {:?}", flush_err);
+            }
+            Err(format!("Error at slot {}: {:?}", slot, e).into())
+        }
     }
 }

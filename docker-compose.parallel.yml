@@ -2,14 +2,11 @@ version: '3.8'
 
 services:
   indexer-1:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: solixdb-indexer:latest
+    image: myusername/solixdb-indexer:latest
     container_name: indexer-1
     environment:
       - SLOT_START=377107390
-      - SLOT_END=377107415
+      - SLOT_END=377107395
       - THREADS=4
       - CLICKHOUSE_URL=http://clickhouse:8123
       - CLEAR_DB_ON_START=true
@@ -29,94 +26,3 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  indexer-2:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: solixdb-indexer:latest
-    container_name: indexer-2
-    environment:
-      - SLOT_START=377107415
-      - SLOT_END=377107440
-      - THREADS=4
-      - CLICKHOUSE_URL=http://clickhouse:8123
-      - CLEAR_DB_ON_START=false
-    restart: "no"
-    networks:
-      - indexer-network
-      - clickhouse-network
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 2G
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  indexer-3:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: solixdb-indexer:latest
-    container_name: indexer-3
-    environment:
-      - SLOT_START=377107440
-      - SLOT_END=377107465
-      - THREADS=4
-      - CLICKHOUSE_URL=http://clickhouse:8123
-      - CLEAR_DB_ON_START=false
-    restart: "no"
-    networks:
-      - indexer-network
-      - clickhouse-network
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 2G
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  indexer-4:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: solixdb-indexer:latest
-    container_name: indexer-4
-    environment:
-      - SLOT_START=377107465
-      - SLOT_END=377107490
-      - THREADS=4
-      - CLICKHOUSE_URL=http://clickhouse:8123
-      - CLEAR_DB_ON_START=false
-    restart: "no"
-    networks:
-      - indexer-network
-      - clickhouse-network
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 2G
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-
-networks:
-  indexer-network:
-    driver: bridge
-  clickhouse-network:
-    external: true
-    name: data_clickhouse-network

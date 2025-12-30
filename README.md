@@ -12,20 +12,43 @@ High-performance Solana blockchain data collection system for analytics platform
 
 ## Quick Start
 
-### Test with 1k slots
+### Single Process
 ```bash
+# Test with 1k slots
 cargo run
-```
 
-### Custom slot range
-```bash
+# Custom slot range
 SLOT_START=377107390 SLOT_END=377108390 cargo run
-```
 
-### November 2025 data (Nov 1 - Dec 1)
-```bash
+# November 2025 data (Nov 1 - Dec 1)
 SLOT_START=377107390 SLOT_END=383639270 THREADS=10 cargo run
 ```
+
+### Parallel Execution (No Docker Required)
+
+Perfect for environments without Docker access (e.g., remote containers, Jupyter):
+
+```bash
+# Build binary first (one time)
+cargo build --release
+
+# Run 4 parallel processes - slot ranges are automatically split!
+./run_parallel_indexers.sh 377107390 377107490 4
+
+# With custom threads and ClickHouse URL
+./run_parallel_indexers.sh 377107390 377107490 4 8 http://your-clickhouse:8123
+```
+
+**You only specify the total range - the script automatically splits it:**
+- Input: `start_slot`, `end_slot`, `num_processes`
+- Script calculates: slot ranges for each process (evenly distributed)
+- Example: 100 slots across 4 processes = 25 slots per process
+
+**Script automatically:**
+- **Splits slot ranges evenly** across all processes (no manual calculation needed!)
+- Sets `CLEAR_DB_ON_START=true` only for first process
+- Creates log files in `logs/` directory
+- Waits for all processes and reports success/failure
 
 ## Environment Variables
 
@@ -38,6 +61,76 @@ SLOT_START=377107390 SLOT_END=383639270 THREADS=10 cargo run
 | `NETWORK` | `mainnet` | Solana network |
 | `CLEAR_DB_ON_START` | `true` | Clear database on startup |
 | `CLEAR_DATA_AFTER` | `false` | Clear data after processing |
+
+## Direct Execution (No Docker)
+
+### Quick Start with Parallel Indexers
+
+If you're in an environment where you can't run Docker (e.g., inside a container without Docker socket access), you can run indexers directly:
+
+```bash
+# Make script executable
+chmod +x run_parallel_indexers.sh
+
+# Run 4 parallel processes
+./run_parallel_indexers.sh 377107390 377107490 4
+
+# With custom threads and ClickHouse URL
+./run_parallel_indexers.sh 377107390 377107490 4 8 http://your-clickhouse:8123
+```
+
+**Script Usage:**
+```bash
+./run_parallel_indexers.sh <start_slot> <end_slot> <num_processes> [threads_per_process] [clickhouse_url]
+```
+
+**Arguments:**
+- `start_slot`: Starting slot number (required)
+- `end_slot`: Ending slot number (required)
+- `num_processes`: Number of parallel processes (1-100, default: 4)
+- `threads_per_process`: Threads per process (default: 4)
+- `clickhouse_url`: ClickHouse URL (default: http://localhost:8123, or use CLICKHOUSE_URL env var)
+
+**Automatic Slot Distribution:**
+The script **automatically splits** the slot range evenly across all processes. You only need to specify:
+- Total slot range (`start_slot` to `end_slot`)
+- Number of processes (`num_processes`)
+
+The script calculates and assigns slot ranges to each process:
+- Example: `./run_parallel_indexers.sh 377107390 377107490 4`
+  - Total: 100 slots (377107490 - 377107390)
+  - Process 1: slots 377107390-377107415 (25 slots)
+  - Process 2: slots 377107415-377107440 (25 slots)
+  - Process 3: slots 377107440-377107465 (25 slots)
+  - Process 4: slots 377107465-377107490 (25 slots)
+
+If slots don't divide evenly, the first few processes get one extra slot.
+
+**Features:**
+- **Automatic slot distribution** - No manual splitting needed!
+- Runs multiple processes in parallel (no Docker needed)
+- Creates log files in `logs/` directory
+- Waits for all processes to complete
+- Shows success/failure status
+- First process clears DB, others don't
+
+**Monitor:**
+```bash
+# Watch all logs
+tail -f logs/indexer-*.log
+
+# Watch specific indexer
+tail -f logs/indexer-1.log
+
+# Check running processes
+ps aux | grep transaction-parser
+```
+
+**Stop:**
+```bash
+# Stop all indexer processes
+pkill -f transaction-parser
+```
 
 ## Docker Setup
 

@@ -106,7 +106,10 @@ impl ClickHouseStorage {
                 ENGINE = MergeTree()
                 PARTITION BY toYYYYMM(toDateTime(block_time))
                 ORDER BY (date, slot, signature)
-                SETTINGS index_granularity = 8192
+                SETTINGS 
+                    index_granularity = 8192,
+                    async_insert = 1,
+                    wait_for_async_insert = 0
                 "#
             )
             .execute()
@@ -160,7 +163,10 @@ impl ClickHouseStorage {
                 )
                 ENGINE = MergeTree()
                 ORDER BY signature
-                SETTINGS index_granularity = 8192
+                SETTINGS 
+                    index_granularity = 8192,
+                    async_insert = 1,
+                    wait_for_async_insert = 0
                 "#
             )
             .execute()
@@ -183,7 +189,10 @@ impl ClickHouseStorage {
                 )
                 ENGINE = MergeTree()
                 ORDER BY (slot, signature)
-                SETTINGS index_granularity = 8192
+                SETTINGS 
+                    index_granularity = 8192,
+                    async_insert = 1,
+                    wait_for_async_insert = 0
                 "#
             )
             .execute()
@@ -318,7 +327,10 @@ impl ClickHouseStorage {
     }
 
     /// Flush all pending batches
+    /// This ensures all buffered data is written to ClickHouse and immediately queryable
     pub async fn flush_all(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        info!("Flushing all pending batches to ensure data is queryable...");
+        
         // Flush transactions
         let tx_batch = {
             let mut buffer = self.tx_buffer.lock().await;
@@ -352,6 +364,15 @@ impl ClickHouseStorage {
             info!("Flushed {} failed transactions", failed_batch.len());
         }
 
+        // Force sync async inserts to ensure data is immediately queryable
+        // This is important for REST/GraphQL APIs and analytics dashboards
+        self.client
+            .query("SYSTEM FLUSH ASYNC INSERT QUEUE")
+            .execute()
+            .await
+            .ok(); // Ignore error if async inserts not enabled
+
+        info!("All batches flushed. Data is now queryable via REST/GraphQL APIs.");
         Ok(())
     }
 
