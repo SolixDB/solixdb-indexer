@@ -1,16 +1,19 @@
+mod config;
 mod helpers;
 mod multi_parser;
 mod storage;
 
+use config::Config;
 use futures_util::FutureExt;
 use helpers::print_summary;
 use jetstreamer_firehose::firehose::*;
 use multi_parser::build_parser_map;
 use std::collections::HashMap;
-use std::sync::atomic::AtomicU64;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::{Instant, SystemTime};
 use storage::ClickHouseStorage;
+use tokio::signal;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -20,31 +23,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_level(true)
         .init();
 
-    let slot_start = std::env::var("SLOT_START")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(383639270);
+    // Load configuration (config file + env vars)
+    let config = Config::load()?;
     
-    let slot_end = std::env::var("SLOT_END")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(383639271);
-
-    if slot_start >= slot_end {
-        return Err(format!(
-            "Invalid slot range: SLOT_START ({}) must be less than SLOT_END ({})",
-            slot_start, slot_end
-        ).into());
-    }
+    // Log loaded configuration
+    tracing::info!("Loaded configuration:");
+    tracing::info!("  Slots: {} to {}", config.slots.start, config.slots.end);
+    tracing::info!("  ClickHouse URL: {}", config.clickhouse.url);
+    tracing::info!("  Clear on start: {}", config.clickhouse.clear_on_start);
+    tracing::info!("  Threads: {}", config.processing.threads);
     
-    let threads = std::env::var("THREADS")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(1);
-    
-    if threads == 0 {
-        return Err("THREADS must be greater than 0".into());
-    }
+    let slot_start = config.slots.start;
+    let slot_end = config.slots.end;
+    let threads = config.processing.threads;
 
     unsafe {
         std::env::set_var("JETSTREAMER_NETWORK", "mainnet");
@@ -53,22 +44,44 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Initialize ClickHouse storage
-    let clickhouse_url = std::env::var("CLICKHOUSE_URL")
-        .unwrap_or_else(|_| "http://localhost:8123".to_string());
-    
-    let clear_db_on_start = std::env::var("CLEAR_DB_ON_START")
-        .ok()
-        .map(|s| s == "true")
-        .unwrap_or(false);
-    
-    let storage = if clear_db_on_start {
+    let storage = if config.clickhouse.clear_on_start {
         tracing::info!("Clearing database and recreating tables...");
-        Arc::new(ClickHouseStorage::new_with_clear(&clickhouse_url).await
+        Arc::new(ClickHouseStorage::new_with_clear(&config.clickhouse.url).await
             .map_err(|e| format!("{}", e))?)
     } else {
-        Arc::new(ClickHouseStorage::new(&clickhouse_url).await
+        Arc::new(ClickHouseStorage::new(&config.clickhouse.url).await
             .map_err(|e| format!("{}", e))?)
     };
+
+    // Graceful shutdown signal handler
+    let shutdown_flag = Arc::new(AtomicBool::new(false));
+    let shutdown_flag_clone = Arc::clone(&shutdown_flag);
+    let storage_clone = Arc::clone(&storage);
+    
+    tokio::spawn(async move {
+        let mut sigterm = signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("Failed to register SIGTERM handler");
+        let mut sigint = signal::unix::signal(signal::unix::SignalKind::interrupt())
+            .expect("Failed to register SIGINT handler");
+        
+        tokio::select! {
+            _ = sigterm.recv() => {
+                tracing::info!("Received SIGTERM, initiating graceful shutdown...");
+            }
+            _ = sigint.recv() => {
+                tracing::info!("Received SIGINT, initiating graceful shutdown...");
+            }
+        }
+        
+        shutdown_flag_clone.store(true, Ordering::Relaxed);
+        
+        // Flush all pending data
+        tracing::info!("Flushing all pending batches before shutdown...");
+        if let Err(e) = storage_clone.flush_all().await {
+            tracing::error!("Failed to flush batches on shutdown: {:?}", e);
+        }
+        tracing::info!("Graceful shutdown complete");
+    });
 
     // Build parser map
     let parser_map = build_parser_map();
@@ -126,7 +139,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let start_time = Instant::now();
     let start_timestamp = std::time::SystemTime::now();
     
-    match firehose(
+    let firehose_result = firehose(
         threads as u64,
         slot_start..slot_end,
         Some(block_handler),
@@ -140,8 +153,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }),
         None,
     )
-    .await
-    {
+    .await;
+    
+    match firehose_result {
         Ok(_) => {
             let end_time = Instant::now();
             let end_timestamp = SystemTime::now();

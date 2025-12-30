@@ -50,17 +50,38 @@ cargo build --release
 - Creates log files in `logs/` directory
 - Waits for all processes and reports success/failure
 
-## Environment Variables
+## Configuration
+
+### Config File (Recommended)
+
+Create a `config.toml` file (see `config.toml.example`):
+
+```toml
+[slots]
+# Starting slot number
+start = 377107390
+# Ending slot number
+end = 377108390
+
+[clickhouse]
+url = "http://100.108.77.69:8123"
+clear_on_start = true
+
+[processing]
+threads = 4
+```
+
+### Environment Variables
+
+Environment variables **override** config file values:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `SLOT_START` | `377107390` | Starting slot (Nov 1, 2025 0:00 UTC) |
 | `SLOT_END` | `377108390` | Ending slot (1k slots for testing) |
 | `THREADS` | `10` | Number of parallel threads |
-| `CLICKHOUSE_URL` | `http://localhost:8123` | ClickHouse server URL |
-| `NETWORK` | `mainnet` | Solana network |
-| `CLEAR_DB_ON_START` | `true` | Clear database on startup |
-| `CLEAR_DATA_AFTER` | `false` | Clear data after processing |
+| `CLICKHOUSE_URL` | `http://localhost:8123` | ClickHouse server URL (supports auth: `http://user:pass@host:port`) |
+| `CLEAR_DB_ON_START` | `false` | Clear database on startup |
 
 ## Direct Execution (No Docker)
 
@@ -85,11 +106,20 @@ chmod +x run_parallel_indexers.sh
 ```
 
 **Arguments:**
-- `start_slot`: Starting slot number (required)
-- `end_slot`: Ending slot number (required)
+- `start_slot`: Starting slot number (required) - Total range start
+- `end_slot`: Ending slot number (required) - Total range end
 - `num_processes`: Number of parallel processes (1-100, default: 4)
 - `threads_per_process`: Threads per process (default: 4)
 - `clickhouse_url`: ClickHouse URL (default: http://localhost:8123, or use CLICKHOUSE_URL env var)
+
+**How Automatic Slot Distribution Works:**
+1. You specify the **total slot range** (e.g., 377107390 to 377107490 = 100 slots)
+2. You specify **number of processes** (e.g., 4)
+3. Script **automatically calculates**:
+   - Base slots per process: `100 / 4 = 25 slots each`
+   - If there's a remainder, first few processes get 1 extra slot
+4. Each process gets its own **unique, non-overlapping** slot range
+5. All processes write to the **same ClickHouse** instance
 
 **Automatic Slot Distribution:**
 The script **automatically splits** the slot range evenly across all processes. You only need to specify:
@@ -350,11 +380,44 @@ docker exec clickhouse clickhouse-client --query "SELECT count() FROM transactio
 docker-compose -f docker-compose.parallel.yml down
 ```
 
+## Production Deployment
+
+### ClickHouse Authentication
+
+For in-house ClickHouse with authentication, use the URL format:
+
+```bash
+# With username/password
+CLICKHOUSE_URL=http://username:password@clickhouse-host:8123
+
+# With TLS/HTTPS
+CLICKHOUSE_URL=https://username:password@clickhouse-host:8443
+
+# Example
+CLICKHOUSE_URL=http://solixdb:secure_password@10.0.0.5:8123
+```
+
+### Production Features
+
+**Implemented:**
+- Authentication support (username/password in URL)
+- Connection health checks on startup
+- Retry logic with exponential backoff (3 retries)
+- Automatic flush on completion/error
+- **Graceful shutdown** (SIGTERM/SIGINT handlers)
+- **Config file support** (`config.toml` with env var override)
+- ZSTD compression (maximum)
+- Batched inserts (1000 rows/batch)
+
+📋 **See [PRODUCTION.md](PRODUCTION.md) for full production readiness checklist**
+
+**Note:** For monitoring multiple instances, monitor ClickHouse directly rather than individual indexer processes.
+
 ## Architecture
 
 ```
 main.rs          → Entry point, firehose setup
 multi_parser.rs  → Multi-protocol parser
-storage.rs       → ClickHouse batched storage
+storage.rs       → ClickHouse batched storage (with retry & auth)
 helpers.rs       → Transaction processing & summary
 ```

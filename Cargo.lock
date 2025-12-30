@@ -10558,6 +10558,7 @@ dependencies = [
  "solana-address 2.0.0",
  "solana-message",
  "tokio",
+ "toml 0.8.23",
  "tracing",
  "tracing-subscriber",
  "yellowstone-grpc-proto",

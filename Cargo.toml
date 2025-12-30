@@ -78,7 +78,7 @@ serde_json.workspace = true
 
 # Async
 futures-util.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = ["signal"] }
 
 # Jetstream
 jetstreamer-firehose.workspace = true
@@ -100,3 +100,6 @@ yellowstone-grpc-proto.workspace = true
 clickhouse.workspace = true
 chrono.workspace = true
 hex.workspace = true
+
+# Config
+toml = "0.8"

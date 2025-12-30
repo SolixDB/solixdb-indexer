@@ -1,9 +1,21 @@
 #!/bin/bash
 
 # Run parallel indexers directly (without Docker)
+# 
+# This script automatically splits slot ranges across multiple processes.
+# You only need to specify the total range - the script handles distribution!
+#
 # Usage: ./run_parallel_indexers.sh <start_slot> <end_slot> <num_processes> [threads_per_process] [clickhouse_url]
 # 
-# Example: ./run_parallel_indexers.sh 377107390 377107490 4 4
+# Examples:
+#   ./run_parallel_indexers.sh 377107390 377107490 4
+#   # Automatically splits 100 slots across 4 processes (25 slots each)
+#
+#   ./run_parallel_indexers.sh 377107390 377107490 4 8 http://clickhouse:8123
+#   # 4 processes, 8 threads each, custom ClickHouse URL
+#
+# Note: Environment variables (SLOT_START, SLOT_END, etc.) override config.toml values
+#       Each process gets its own slot range automatically calculated
 
 set -euo pipefail
 
@@ -18,14 +30,23 @@ DEFAULT_START_SLOT=377107390
 DEFAULT_END_SLOT=377107490
 DEFAULT_NUM_PROCESSES=4
 DEFAULT_THREADS=4
-DEFAULT_CLICKHOUSE_URL=${CLICKHOUSE_URL:-"http://localhost:8123"}
 
 # Parse arguments
 START_SLOT=${1:-$DEFAULT_START_SLOT}
 END_SLOT=${2:-$DEFAULT_END_SLOT}
 NUM_PROCESSES=${3:-$DEFAULT_NUM_PROCESSES}
 THREADS_PER_PROCESS=${4:-$DEFAULT_THREADS}
-CLICKHOUSE_URL=${5:-$DEFAULT_CLICKHOUSE_URL}
+
+# ClickHouse URL: use argument, then env var, then let config.toml handle it (don't set if not provided)
+if [ -n "${5:-}" ]; then
+    CLICKHOUSE_URL=$5
+elif [ -n "${CLICKHOUSE_URL:-}" ]; then
+    # Use existing env var
+    CLICKHOUSE_URL=$CLICKHOUSE_URL
+else
+    # Don't set it - let config.toml or program defaults handle it
+    CLICKHOUSE_URL=""
+fi
 
 # Validate inputs
 if ! [[ "$START_SLOT" =~ ^[0-9]+$ ]]; then
@@ -53,16 +74,22 @@ TOTAL_SLOTS=$((END_SLOT - START_SLOT))
 SLOTS_PER_PROCESS=$((TOTAL_SLOTS / NUM_PROCESSES))
 REMAINDER=$((TOTAL_SLOTS % NUM_PROCESSES))
 
-echo -e "${GREEN}Starting parallel indexers${NC}"
+echo -e "${GREEN}Starting parallel indexers with automatic slot distribution${NC}"
 echo -e "${YELLOW}Configuration:${NC}"
-echo "  Start Slot: $START_SLOT"
-echo "  End Slot: $END_SLOT"
-echo "  Total Slots: $TOTAL_SLOTS"
+echo "  Total Slot Range: $START_SLOT to $END_SLOT ($TOTAL_SLOTS slots)"
 echo "  Number of Processes: $NUM_PROCESSES"
-echo "  Slots per Process: $SLOTS_PER_PROCESS"
-echo "  Remainder: $REMAINDER"
 echo "  Threads per Process: $THREADS_PER_PROCESS"
-echo "  ClickHouse URL: $CLICKHOUSE_URL"
+if [ -n "$CLICKHOUSE_URL" ]; then
+    echo "  ClickHouse URL: $CLICKHOUSE_URL (overrides config.toml)"
+else
+    echo "  ClickHouse URL: (will use config.toml or default)"
+fi
+echo ""
+echo -e "${YELLOW}Automatic Slot Distribution:${NC}"
+echo "  Base slots per process: $SLOTS_PER_PROCESS"
+if [ $REMAINDER -gt 0 ]; then
+    echo "  First $REMAINDER process(es) will get 1 extra slot"
+fi
 echo ""
 
 # Check if binary exists, otherwise use cargo run
@@ -106,7 +133,7 @@ for i in $(seq 1 $NUM_PROCESSES); do
     
     LOG_FILE="logs/indexer-${i}.log"
     
-    echo -e "${GREEN}Starting indexer-${i}:${NC} slots ${PROCESS_START} to ${PROCESS_END} (${PROCESS_SLOTS} slots) - CLEAR_DB_ON_START=${CLEAR_DB}"
+    echo -e "${GREEN}  → indexer-${i}:${NC} slots ${PROCESS_START} to ${PROCESS_END} (${PROCESS_SLOTS} slots) [CLEAR_DB_ON_START=${CLEAR_DB}]"
     
     # Set environment variables and run
     if [ "$USE_CARGO" = true ]; then
@@ -141,21 +168,32 @@ echo ""
 echo -e "${GREEN}✓ Started ${NUM_PROCESSES} indexer processes${NC}"
 echo -e "${YELLOW}Process IDs:${NC} ${PIDS[*]}"
 echo ""
+echo -e "${YELLOW}Each process will:${NC}"
+echo "  • Process its assigned slot range automatically"
+echo "  • Write to the same ClickHouse instance"
+echo "  • Create its own log file"
+echo ""
 echo -e "${YELLOW}Log files:${NC}"
 for i in $(seq 1 $NUM_PROCESSES); do
     echo "  logs/indexer-${i}.log"
 done
 echo ""
-echo -e "${YELLOW}Monitor logs:${NC}"
-echo "  tail -f logs/indexer-1.log"
+echo -e "${YELLOW}Monitor progress:${NC}"
+echo "  # Watch all logs in real-time"
 echo "  tail -f logs/indexer-*.log"
 echo ""
-echo -e "${YELLOW}Check status:${NC}"
+echo "  # Watch specific indexer"
+echo "  tail -f logs/indexer-1.log"
+echo ""
+echo "  # Check running processes"
 echo "  ps aux | grep transaction-parser"
 echo ""
 echo -e "${YELLOW}Stop all processes:${NC}"
 echo "  pkill -f transaction-parser"
-echo "  # Or: kill ${PIDS[*]}"
+echo "  # Or individually: kill ${PIDS[*]}"
+echo ""
+echo -e "${YELLOW}Note:${NC} Each process uses config.toml (if present) but environment variables override it."
+echo "      Slot ranges are set via environment variables for each process."
 echo ""
 
 # Wait for all processes to complete

@@ -55,6 +55,11 @@ pub struct ClickHouseStorage {
 
 impl ClickHouseStorage {
     /// Create a new ClickHouse storage instance and initialize tables
+    /// 
+    /// URL format supports authentication:
+    /// - `http://host:port` (no auth)
+    /// - `http://username:password@host:port` (with auth)
+    /// - `https://username:password@host:port` (with TLS)
     pub async fn new(url: &str) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
         let client = Client::default().with_url(url);
         let storage = Self {
@@ -64,6 +69,11 @@ impl ClickHouseStorage {
             failed_buffer: Arc::new(Mutex::new(Vec::new())),
             batch_size: 1000,
         };
+        
+        // Health check: verify connection before proceeding
+        storage.health_check().await
+            .map_err(|e| format!("ClickHouse health check failed: {}. Please verify CLICKHOUSE_URL and credentials.", e))?;
+        
         storage.create_tables().await.map_err(|e| format!("{}", e))?;
         Ok(storage)
     }
@@ -78,9 +88,26 @@ impl ClickHouseStorage {
             failed_buffer: Arc::new(Mutex::new(Vec::new())),
             batch_size: 1000,
         };
+        
+        // Health check: verify connection before proceeding
+        storage.health_check().await
+            .map_err(|e| format!("ClickHouse health check failed: {}. Please verify CLICKHOUSE_URL and credentials.", e))?;
+        
         storage.drop_all_tables().await.map_err(|e| format!("{}", e))?;
         storage.create_tables().await.map_err(|e| format!("{}", e))?;
         Ok(storage)
+    }
+
+    /// Health check: verify ClickHouse connection is working
+    async fn health_check(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // Simple ping query to verify connection and authentication
+        self.client
+            .query("SELECT 1")
+            .fetch_one::<u8>()
+            .await
+            .map_err(|e| format!("Connection test failed: {}", e))?;
+        info!("ClickHouse connection verified successfully");
+        Ok(())
     }
 
     async fn create_tables(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -285,6 +312,31 @@ impl ClickHouseStorage {
         if batch.is_empty() {
             return Ok(());
         }
+        
+        // Retry logic for production resilience
+        let max_retries = 3;
+        let mut last_error = None;
+        
+        for attempt in 1..=max_retries {
+            match self.try_insert_transactions(batch).await {
+                Ok(()) => return Ok(()),
+                Err(e) => {
+                    last_error = Some(e);
+                    if attempt < max_retries {
+                        let delay_ms = 1000 * attempt; // Exponential backoff: 1s, 2s, 3s
+                        error!("Failed to insert transactions batch (attempt {}/{}), retrying in {}ms...", 
+                            attempt, max_retries, delay_ms);
+                        tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms)).await;
+                    }
+                }
+            }
+        }
+        
+        Err(format!("Failed to insert transactions after {} retries: {:?}", 
+            max_retries, last_error).into())
+    }
+    
+    async fn try_insert_transactions(&self, batch: &[Transaction]) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let mut inserter = self.client.insert("transactions")
             .map_err(|e| format!("{}", e))?;
         for tx in batch {
@@ -300,6 +352,31 @@ impl ClickHouseStorage {
         if batch.is_empty() {
             return Ok(());
         }
+        
+        // Retry logic for production resilience
+        let max_retries = 3;
+        let mut last_error = None;
+        
+        for attempt in 1..=max_retries {
+            match self.try_insert_payloads(batch).await {
+                Ok(()) => return Ok(()),
+                Err(e) => {
+                    last_error = Some(e);
+                    if attempt < max_retries {
+                        let delay_ms = 1000 * attempt;
+                        error!("Failed to insert payloads batch (attempt {}/{}), retrying in {}ms...", 
+                            attempt, max_retries, delay_ms);
+                        tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms)).await;
+                    }
+                }
+            }
+        }
+        
+        Err(format!("Failed to insert payloads after {} retries: {:?}", 
+            max_retries, last_error).into())
+    }
+    
+    async fn try_insert_payloads(&self, batch: &[TransactionPayload]) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let mut inserter = self.client.insert("transaction_payloads")
             .map_err(|e| format!("{}", e))?;
         for payload in batch {
@@ -315,6 +392,31 @@ impl ClickHouseStorage {
         if batch.is_empty() {
             return Ok(());
         }
+        
+        // Retry logic for production resilience
+        let max_retries = 3;
+        let mut last_error = None;
+        
+        for attempt in 1..=max_retries {
+            match self.try_insert_failed(batch).await {
+                Ok(()) => return Ok(()),
+                Err(e) => {
+                    last_error = Some(e);
+                    if attempt < max_retries {
+                        let delay_ms = 1000 * attempt;
+                        error!("Failed to insert failed transactions batch (attempt {}/{}), retrying in {}ms...", 
+                            attempt, max_retries, delay_ms);
+                        tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms)).await;
+                    }
+                }
+            }
+        }
+        
+        Err(format!("Failed to insert failed transactions after {} retries: {:?}", 
+            max_retries, last_error).into())
+    }
+    
+    async fn try_insert_failed(&self, batch: &[FailedTransaction]) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let mut inserter = self.client.insert("failed_transactions")
             .map_err(|e| format!("{}", e))?;
         for failed in batch {
