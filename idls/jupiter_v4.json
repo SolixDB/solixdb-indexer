@@ -1,0 +1,5626 @@
+{
+  "kind": "rootNode",
+  "standard": "codama",
+  "version": "1.5.0",
+  "program": {
+    "kind": "programNode",
+    "name": "jupiter_v4",
+    "publicKey": "JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB",
+    "version": "0.1.0",
+    "origin": "anchor",
+    "docs": [],
+    "accounts": [],
+    "instructions": [
+      {
+        "kind": "instructionNode",
+        "name": "route",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userTransferAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "destinationTokenAccount",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "e517cb977ae3ad2a",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "swapLeg",
+            "docs": [],
+            "type": {
+              "kind": "definedTypeLinkNode",
+              "name": "swapLeg"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "inAmount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "quotedOutAmount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "slippageBps",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u16",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "platformFeeBps",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u8",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "whirlpoolSwapExactOutput",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "whirlpool",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenOwnerAccountA",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenVaultA",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenOwnerAccountB",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenVaultB",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tickArray0",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tickArray1",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tickArray2",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "oracle",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Oracle is currently unused and will be enabled on subsequent updates"
+            ]
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "273a2680643ebff9",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "outAmount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "inAmountWithSlippage",
+            "docs": [],
+            "type": {
+              "kind": "definedTypeLinkNode",
+              "name": "amountWithSlippage"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "aToB",
+            "docs": [],
+            "type": {
+              "kind": "booleanTypeNode",
+              "size": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "platformFeeBps",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u8",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "raydiumSwapExactOutput",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammId",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammOpenOrders",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolCoinTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolPcTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumProgramId",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumMarket",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumBids",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumAsks",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumEventQueue",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumCoinVaultAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumPcVaultAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumVaultSigner",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userSourceTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userDestinationTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userSourceOwner",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "f9c97e677f78b11d",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "outAmount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "inAmountWithSlippage",
+            "docs": [],
+            "type": {
+              "kind": "definedTypeLinkNode",
+              "name": "amountWithSlippage"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "platformFeeBps",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u8",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "raydiumClmmSwapExactOutput",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "payer",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "payerValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "observationState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tickArray",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "25b259925bf1ec61",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "outAmount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "inAmountWithSlippage",
+            "docs": [],
+            "type": {
+              "kind": "definedTypeLinkNode",
+              "name": "amountWithSlippage"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "platformFeeBps",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u8",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "createOpenOrders",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "openOrders",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "payer",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "payerValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "dexProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "splSystem"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "rent",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "SysvarRent111111111111111111111111111111111"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "market",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "e5c2d4ac080a8693",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "createOpenOrderV2",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "openOrders",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "payer",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "payerValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "dexProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "splSystem"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "rent",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "SysvarRent111111111111111111111111111111111"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "market",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "ed215cdedc062acb",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "mercurialSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapState",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userTransferAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "sourceTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "destinationTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "02054dadc500079d",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "cykuraSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "signer",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "factoryState",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "lastObservationState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "coreProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "26f1156b783bb8f9",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "serumSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "market",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "openOrders",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "requestQueue",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "eventQueue",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "bids",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "asks",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "coinVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pcVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vaultSigner",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "identityValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "orderPayerTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "coinWallet",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pcWallet",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "dexProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "rent",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "SysvarRent111111111111111111111111111111111"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "58b746f9d67652d2",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "saberSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swap",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputUserAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputUserAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "feesTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "403e62e2344a25b2",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "saberAddDecimals",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "addDecimalsProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "wrapper",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "wrapperMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "wrapperUnderlyingTokens",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userUnderlyingTokens",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userWrappedTokens",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "2435e7b807b505ee",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "tokenSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenSwapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swap",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "identityValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userTransferAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "source",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapSource",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapDestination",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "destination",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolFee",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "bbc076d43e6d1cd5",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "senchaSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swap",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputUserAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputFeesAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputUserAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputFeesAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "19320715cff8e6c2",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "stepSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenSwapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swap",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "identityValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userTransferAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "source",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapSource",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapDestination",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "destination",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolFee",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "9b38d0c61b3d95e9",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "cropperSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenSwapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swap",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapState",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "identityValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userTransferAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "source",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapSource",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapDestination",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "destination",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolFee",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "e6d82fb6a575d267",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "raydiumSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammId",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammOpenOrders",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolCoinTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolPcTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumProgramId",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumMarket",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumBids",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumAsks",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumEventQueue",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumCoinVaultAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumPcVaultAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "serumVaultSigner",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userSourceTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userDestinationTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userSourceOwner",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "b1ad2af0b8047c51",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "cremaSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "clmmConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "clmmpool",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenA",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenB",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "accountA",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "accountB",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenAVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenBVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tickArrayMap",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "partner",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "partnerAtaA",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "partnerAtaB",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "a9dc29fa23be85c6",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "lifinitySwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "identityValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "amm",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userTransferAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "sourceInfo",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "destinationInfo",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapSource",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapDestination",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "feeAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pythAccount",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pythPcAccount",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "configAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "1760a5215ad66099",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "marinadeDeposit",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "marinadeFinanceProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "state",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "msolMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "liqPoolSolLegPda",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "liqPoolMsolLeg",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "liqPoolMsolLegAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "reservePda",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "transferFrom",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "mintTo",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "msolMintAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "splSystem"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userWsolTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tempWsolTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userTransferAuthority",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "wsolMint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "rent",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "SysvarRent111111111111111111111111111111111"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "3eecf81cdee8b649",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "marinadeUnstake",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "marinadeFinanceProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "state",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "msolMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "liqPoolSolLegPda",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "liqPoolMsolLeg",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "treasuryMsolAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "getMsolFrom",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "getMsolFromAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "transferSolTo",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "splSystem"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userWsolTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "29780f0071db2a01",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "aldrinSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pool",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolSigner",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "baseTokenVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "quoteTokenVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "feePoolTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "walletAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userBaseTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userQuoteTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "fbe877a6e1b9a9a1",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "aldrinV2Swap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pool",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolSigner",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "baseTokenVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "quoteTokenVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "feePoolTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "walletAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userBaseTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userQuoteTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "curve",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "bea6598b2198100a",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "whirlpoolSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "whirlpool",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenOwnerAccountA",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenVaultA",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenOwnerAccountB",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenVaultB",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tickArray0",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tickArray1",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tickArray2",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "oracle",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Oracle is currently unused and will be enabled on subsequent updates"
+            ]
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "7be5b83f0c005c91",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "invariantSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "state",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pool",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tickmap",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "accountX",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "accountY",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "reserveX",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "reserveY",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "programAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "bbc128792f4990b1",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "meteoraSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pool",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userSourceToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userDestinationToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "aVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "bVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "aTokenVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "bTokenVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "aVaultLpMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "bVaultLpMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "aVaultLp",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "bVaultLp",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "adminTokenFee",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "user",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vaultProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "7f7de20c5118cc23",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "goosefxSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "controller",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pair",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "sslIn",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "sslOut",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "liabilityVaultIn",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swappedLiabilityVaultIn",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "liabilityVaultOut",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swappedLiabilityVaultOut",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userInAta",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userOutAta",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "feeCollectorAta",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userWallet",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "feeCollector",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "de882e7bbd7d7c7a",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "deltafiSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "marketConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapInfo",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userSourceToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userDestinationToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapSourceToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapDestinationToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "deltafiUser",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "adminDestinationToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pythPriceBase",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pythPriceQuote",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "84e66678cd09edbe",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "balansolSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "identityValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pool",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "taxMan",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "bidMint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "treasurer",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "srcTreasury",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "srcAssociatedTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "askMint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "dstTreasury",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "dstAssociatedTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "dstTokenAccountTaxman",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "splSystem"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "associatedTokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "rent",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "SysvarRent111111111111111111111111111111111"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "896dfdfd466d0b64",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "marcoPoloSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "state",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pool",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenX",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenY",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolXAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolYAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapperXAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapperYAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapper",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "referrerXAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "referrerYAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "referrer",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "programAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "splSystem"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "associatedTokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "rent",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "SysvarRent111111111111111111111111111111111"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "f1935e0f3a6cb344",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "dradexSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "pair",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "market",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "eventQueue",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "dexUser",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "marketUser",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "bids",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "asks",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "t0Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "t1Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "t0User",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "t1User",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "master",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "signer",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "splSystem"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "logger",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "2292a02633553a97",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "lifinityV2Swap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "identityValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "amm",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "userTransferAuthority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "sourceInfo",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "destinationInfo",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapSource",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapDestination",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "feeAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "oracleMainAccount",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "oracleSubAccount",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "oraclePcAccount",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "1398c3f5bb904ae3",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "raydiumClmmSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "payer",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "payerValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "observationState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tickArray",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "2fb8d5c123d25704",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "phoenixSwap",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "swapProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "logAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "market",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "trader",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "baseAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "quoteAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "baseVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "quoteVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "6342df5fec831a8c",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "claimBonk",
+        "docs": [],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "openOrders",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "bonkMint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "openOrdersBonkTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "market",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "openOrdersOwner",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "claimerTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "splToken"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "dfafbad401ce52db",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      }
+    ],
+    "definedTypes": [
+      {
+        "kind": "definedTypeNode",
+        "name": "amountWithSlippage",
+        "docs": [],
+        "type": {
+          "kind": "structTypeNode",
+          "fields": [
+            {
+              "kind": "structFieldTypeNode",
+              "name": "amount",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "slippageBps",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u16",
+                "endian": "le"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "definedTypeNode",
+        "name": "splitLegDeeper",
+        "docs": [],
+        "type": {
+          "kind": "structTypeNode",
+          "fields": [
+            {
+              "kind": "structFieldTypeNode",
+              "name": "percent",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "swapLeg",
+              "docs": [],
+              "type": {
+                "kind": "definedTypeLinkNode",
+                "name": "swapLegSwap"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "definedTypeNode",
+        "name": "splitLeg",
+        "docs": [],
+        "type": {
+          "kind": "structTypeNode",
+          "fields": [
+            {
+              "kind": "structFieldTypeNode",
+              "name": "percent",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "swapLeg",
+              "docs": [],
+              "type": {
+                "kind": "definedTypeLinkNode",
+                "name": "swapLegDeeper"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "definedTypeNode",
+        "name": "side",
+        "docs": [],
+        "type": {
+          "kind": "enumTypeNode",
+          "variants": [
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "bid"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "ask"
+            }
+          ],
+          "size": {
+            "kind": "numberTypeNode",
+            "format": "u8",
+            "endian": "le"
+          }
+        }
+      },
+      {
+        "kind": "definedTypeNode",
+        "name": "swapLegSwap",
+        "docs": [],
+        "type": {
+          "kind": "enumTypeNode",
+          "variants": [
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "placeholderOne"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "placeholderTwo"
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "swap",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "swap",
+                    "docs": [],
+                    "type": {
+                      "kind": "definedTypeLinkNode",
+                      "name": "swap"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "size": {
+            "kind": "numberTypeNode",
+            "format": "u8",
+            "endian": "le"
+          }
+        }
+      },
+      {
+        "kind": "definedTypeNode",
+        "name": "swapLegDeeper",
+        "docs": [],
+        "type": {
+          "kind": "enumTypeNode",
+          "variants": [
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "chain",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "swapLegs",
+                    "docs": [],
+                    "type": {
+                      "kind": "arrayTypeNode",
+                      "item": {
+                        "kind": "definedTypeLinkNode",
+                        "name": "swapLegSwap"
+                      },
+                      "count": {
+                        "kind": "prefixedCountNode",
+                        "prefix": {
+                          "kind": "numberTypeNode",
+                          "format": "u32",
+                          "endian": "le"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "split",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "splitLegs",
+                    "docs": [],
+                    "type": {
+                      "kind": "arrayTypeNode",
+                      "item": {
+                        "kind": "definedTypeLinkNode",
+                        "name": "splitLegDeeper"
+                      },
+                      "count": {
+                        "kind": "prefixedCountNode",
+                        "prefix": {
+                          "kind": "numberTypeNode",
+                          "format": "u32",
+                          "endian": "le"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "swap",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "swap",
+                    "docs": [],
+                    "type": {
+                      "kind": "definedTypeLinkNode",
+                      "name": "swap"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "size": {
+            "kind": "numberTypeNode",
+            "format": "u8",
+            "endian": "le"
+          }
+        }
+      },
+      {
+        "kind": "definedTypeNode",
+        "name": "swapLeg",
+        "docs": [],
+        "type": {
+          "kind": "enumTypeNode",
+          "variants": [
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "chain",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "swapLegs",
+                    "docs": [],
+                    "type": {
+                      "kind": "arrayTypeNode",
+                      "item": {
+                        "kind": "definedTypeLinkNode",
+                        "name": "swapLegDeeper"
+                      },
+                      "count": {
+                        "kind": "prefixedCountNode",
+                        "prefix": {
+                          "kind": "numberTypeNode",
+                          "format": "u32",
+                          "endian": "le"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "split",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "splitLegs",
+                    "docs": [],
+                    "type": {
+                      "kind": "arrayTypeNode",
+                      "item": {
+                        "kind": "definedTypeLinkNode",
+                        "name": "splitLeg"
+                      },
+                      "count": {
+                        "kind": "prefixedCountNode",
+                        "prefix": {
+                          "kind": "numberTypeNode",
+                          "format": "u32",
+                          "endian": "le"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "swap",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "swap",
+                    "docs": [],
+                    "type": {
+                      "kind": "definedTypeLinkNode",
+                      "name": "swap"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "size": {
+            "kind": "numberTypeNode",
+            "format": "u8",
+            "endian": "le"
+          }
+        }
+      },
+      {
+        "kind": "definedTypeNode",
+        "name": "swap",
+        "docs": [],
+        "type": {
+          "kind": "enumTypeNode",
+          "variants": [
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "saber"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "saberAddDecimalsDeposit"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "saberAddDecimalsWithdraw"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "tokenSwap"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "sencha"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "step"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "cropper"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "raydium"
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "crema",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "aToB",
+                    "docs": [],
+                    "type": {
+                      "kind": "booleanTypeNode",
+                      "size": {
+                        "kind": "numberTypeNode",
+                        "format": "u8",
+                        "endian": "le"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "lifinity"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "mercurial"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "cykura"
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "serum",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "side",
+                    "docs": [],
+                    "type": {
+                      "kind": "definedTypeLinkNode",
+                      "name": "side"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "marinadeDeposit"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "marinadeUnstake"
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "aldrin",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "side",
+                    "docs": [],
+                    "type": {
+                      "kind": "definedTypeLinkNode",
+                      "name": "side"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "aldrinV2",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "side",
+                    "docs": [],
+                    "type": {
+                      "kind": "definedTypeLinkNode",
+                      "name": "side"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "whirlpool",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "aToB",
+                    "docs": [],
+                    "type": {
+                      "kind": "booleanTypeNode",
+                      "size": {
+                        "kind": "numberTypeNode",
+                        "format": "u8",
+                        "endian": "le"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "invariant",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "xToY",
+                    "docs": [],
+                    "type": {
+                      "kind": "booleanTypeNode",
+                      "size": {
+                        "kind": "numberTypeNode",
+                        "format": "u8",
+                        "endian": "le"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "meteora"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "gooseFX"
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "deltaFi",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "stable",
+                    "docs": [],
+                    "type": {
+                      "kind": "booleanTypeNode",
+                      "size": {
+                        "kind": "numberTypeNode",
+                        "format": "u8",
+                        "endian": "le"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "balansol"
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "marcoPolo",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "xToY",
+                    "docs": [],
+                    "type": {
+                      "kind": "booleanTypeNode",
+                      "size": {
+                        "kind": "numberTypeNode",
+                        "format": "u8",
+                        "endian": "le"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "dradex",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "side",
+                    "docs": [],
+                    "type": {
+                      "kind": "definedTypeLinkNode",
+                      "name": "side"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "lifinityV2"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "raydiumClmm"
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "openbook",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "side",
+                    "docs": [],
+                    "type": {
+                      "kind": "definedTypeLinkNode",
+                      "name": "side"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "enumStructVariantTypeNode",
+              "name": "phoenix",
+              "struct": {
+                "kind": "structTypeNode",
+                "fields": [
+                  {
+                    "kind": "structFieldTypeNode",
+                    "name": "side",
+                    "docs": [],
+                    "type": {
+                      "kind": "definedTypeLinkNode",
+                      "name": "side"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "size": {
+            "kind": "numberTypeNode",
+            "format": "u8",
+            "endian": "le"
+          }
+        }
+      }
+    ],
+    "pdas": [],
+    "errors": [
+      {
+        "kind": "errorNode",
+        "name": "emptyRoute",
+        "code": 6000,
+        "message": "Empty route",
+        "docs": [
+          "EmptyRoute: Empty route"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "slippageToleranceExceeded",
+        "code": 6001,
+        "message": "Slippage tolerance exceeded",
+        "docs": [
+          "SlippageToleranceExceeded: Slippage tolerance exceeded"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "invalidCalculation",
+        "code": 6002,
+        "message": "Invalid calculation",
+        "docs": [
+          "InvalidCalculation: Invalid calculation"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "missingPlatformFeeAccount",
+        "code": 6003,
+        "message": "Missing platform fee account",
+        "docs": [
+          "MissingPlatformFeeAccount: Missing platform fee account"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "invalidSlippage",
+        "code": 6004,
+        "message": "Invalid slippage",
+        "docs": [
+          "InvalidSlippage: Invalid slippage"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "notEnoughPercent",
+        "code": 6005,
+        "message": "Not enough percent to 100",
+        "docs": [
+          "NotEnoughPercent: Not enough percent to 100"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "inAmountsStackIsEmpty",
+        "code": 6006,
+        "message": "In amounts stack is empty",
+        "docs": [
+          "InAmountsStackIsEmpty: In amounts stack is empty"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "outAmountsStackIsEmpty",
+        "code": 6007,
+        "message": "Out amounts stack is empty",
+        "docs": [
+          "OutAmountsStackIsEmpty: Out amounts stack is empty"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "notEnoughAccountKeys",
+        "code": 6008,
+        "message": "Not Enough Account keys",
+        "docs": [
+          "NotEnoughAccountKeys: Not Enough Account keys"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "nonZeroMinimumOutAmountNotSupported",
+        "code": 6009,
+        "message": "Non zero minimum out amount not supported",
+        "docs": [
+          "NonZeroMinimumOutAmountNotSupported: Non zero minimum out amount not supported"
+        ]
+      }
+    ]
+  },
+  "additionalPrograms": []
+}

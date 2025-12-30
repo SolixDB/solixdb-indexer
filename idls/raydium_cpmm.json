@@ -1,0 +1,4664 @@
+{
+  "kind": "rootNode",
+  "standard": "codama",
+  "version": "1.5.0",
+  "program": {
+    "kind": "programNode",
+    "name": "raydiumCpSwap",
+    "publicKey": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C",
+    "version": "0.2.0",
+    "origin": "anchor",
+    "docs": [],
+    "accounts": [
+      {
+        "kind": "accountNode",
+        "name": "ammConfig",
+        "size": 236,
+        "docs": [],
+        "data": {
+          "kind": "structTypeNode",
+          "fields": [
+            {
+              "kind": "structFieldTypeNode",
+              "name": "discriminator",
+              "defaultValueStrategy": "omitted",
+              "docs": [],
+              "type": {
+                "kind": "fixedSizeTypeNode",
+                "size": 8,
+                "type": {
+                  "kind": "bytesTypeNode"
+                }
+              },
+              "defaultValue": {
+                "kind": "bytesValueNode",
+                "data": "daf42168cbcb2b6f",
+                "encoding": "base16"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "bump",
+              "docs": [
+                "Bump to identify PDA"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "disableCreatePool",
+              "docs": [
+                "Status to control if new pool can be create"
+              ],
+              "type": {
+                "kind": "booleanTypeNode",
+                "size": {
+                  "kind": "numberTypeNode",
+                  "format": "u8",
+                  "endian": "le"
+                }
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "index",
+              "docs": [
+                "Config index"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u16",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "tradeFeeRate",
+              "docs": [
+                "The trade fee, denominated in hundredths of a bip (10^-6)"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "protocolFeeRate",
+              "docs": [
+                "The protocol fee"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "fundFeeRate",
+              "docs": [
+                "The fund fee, denominated in hundredths of a bip (10^-6)"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "createPoolFee",
+              "docs": [
+                "Fee for create a new pool"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "protocolOwner",
+              "docs": [
+                "Address of the protocol fee owner"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "fundOwner",
+              "docs": [
+                "Address of the fund fee owner"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "creatorFeeRate",
+              "docs": [
+                "The pool creator fee, denominated in hundredths of a bip (10^-6)"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "padding",
+              "docs": [
+                "padding"
+              ],
+              "type": {
+                "kind": "arrayTypeNode",
+                "item": {
+                  "kind": "numberTypeNode",
+                  "format": "u64",
+                  "endian": "le"
+                },
+                "count": {
+                  "kind": "fixedCountNode",
+                  "value": 15
+                }
+              }
+            }
+          ]
+        },
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "accountNode",
+        "name": "observationState",
+        "size": 4075,
+        "docs": [],
+        "data": {
+          "kind": "structTypeNode",
+          "fields": [
+            {
+              "kind": "structFieldTypeNode",
+              "name": "discriminator",
+              "defaultValueStrategy": "omitted",
+              "docs": [],
+              "type": {
+                "kind": "fixedSizeTypeNode",
+                "size": 8,
+                "type": {
+                  "kind": "bytesTypeNode"
+                }
+              },
+              "defaultValue": {
+                "kind": "bytesValueNode",
+                "data": "7aaec5358109a584",
+                "encoding": "base16"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "initialized",
+              "docs": [
+                "Whether the ObservationState is initialized"
+              ],
+              "type": {
+                "kind": "booleanTypeNode",
+                "size": {
+                  "kind": "numberTypeNode",
+                  "format": "u8",
+                  "endian": "le"
+                }
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "observationIndex",
+              "docs": [
+                "the most-recently updated index of the observations array"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u16",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "poolId",
+              "docs": [],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "observations",
+              "docs": [
+                "observation array"
+              ],
+              "type": {
+                "kind": "arrayTypeNode",
+                "item": {
+                  "kind": "definedTypeLinkNode",
+                  "name": "observation"
+                },
+                "count": {
+                  "kind": "fixedCountNode",
+                  "value": 100
+                }
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "padding",
+              "docs": [
+                "padding for feature update"
+              ],
+              "type": {
+                "kind": "arrayTypeNode",
+                "item": {
+                  "kind": "numberTypeNode",
+                  "format": "u64",
+                  "endian": "le"
+                },
+                "count": {
+                  "kind": "fixedCountNode",
+                  "value": 4
+                }
+              }
+            }
+          ]
+        },
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "accountNode",
+        "name": "permission",
+        "size": 280,
+        "docs": [],
+        "data": {
+          "kind": "structTypeNode",
+          "fields": [
+            {
+              "kind": "structFieldTypeNode",
+              "name": "discriminator",
+              "defaultValueStrategy": "omitted",
+              "docs": [],
+              "type": {
+                "kind": "fixedSizeTypeNode",
+                "size": 8,
+                "type": {
+                  "kind": "bytesTypeNode"
+                }
+              },
+              "defaultValue": {
+                "kind": "bytesValueNode",
+                "data": "e0531c4f0afda11c",
+                "encoding": "base16"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "authority",
+              "docs": [
+                "authority"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "padding",
+              "docs": [
+                "padding"
+              ],
+              "type": {
+                "kind": "arrayTypeNode",
+                "item": {
+                  "kind": "numberTypeNode",
+                  "format": "u64",
+                  "endian": "le"
+                },
+                "count": {
+                  "kind": "fixedCountNode",
+                  "value": 30
+                }
+              }
+            }
+          ]
+        },
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "accountNode",
+        "name": "poolState",
+        "size": 637,
+        "docs": [],
+        "data": {
+          "kind": "structTypeNode",
+          "fields": [
+            {
+              "kind": "structFieldTypeNode",
+              "name": "discriminator",
+              "defaultValueStrategy": "omitted",
+              "docs": [],
+              "type": {
+                "kind": "fixedSizeTypeNode",
+                "size": 8,
+                "type": {
+                  "kind": "bytesTypeNode"
+                }
+              },
+              "defaultValue": {
+                "kind": "bytesValueNode",
+                "data": "f7ede3f5d7c3de46",
+                "encoding": "base16"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "ammConfig",
+              "docs": [
+                "Which config the pool belongs"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "poolCreator",
+              "docs": [
+                "pool creator"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token0Vault",
+              "docs": [
+                "Token A"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token1Vault",
+              "docs": [
+                "Token B"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "lpMint",
+              "docs": [
+                "Pool tokens are issued when A or B tokens are deposited.",
+                "Pool tokens can be withdrawn back to the original A or B token."
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token0Mint",
+              "docs": [
+                "Mint information for token A"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token1Mint",
+              "docs": [
+                "Mint information for token B"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token0Program",
+              "docs": [
+                "token_0 program"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token1Program",
+              "docs": [
+                "token_1 program"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "observationKey",
+              "docs": [
+                "observation account to store oracle data"
+              ],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "authBump",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "status",
+              "docs": [
+                "Bitwise representation of the state of the pool",
+                "bit0, 1: disable deposit(value is 1), 0: normal",
+                "bit1, 1: disable withdraw(value is 2), 0: normal",
+                "bit2, 1: disable swap(value is 4), 0: normal"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "lpMintDecimals",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "mint0Decimals",
+              "docs": [
+                "mint0 and mint1 decimals"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "mint1Decimals",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "lpSupply",
+              "docs": [
+                "True circulating supply without burns and lock ups"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "protocolFeesToken0",
+              "docs": [
+                "The amounts of token_0 and token_1 that are owed to the liquidity provider."
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "protocolFeesToken1",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "fundFeesToken0",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "fundFeesToken1",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "openTime",
+              "docs": [
+                "The timestamp allowed for swap in the pool."
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "recentEpoch",
+              "docs": [
+                "recent epoch"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "creatorFeeOn",
+              "docs": [
+                "Creator fee collect mode",
+                "0: both token_0 and token_1 can be used as trade fees. It depends on what the input token is when swapping",
+                "1: only token_0 as trade fee",
+                "2: only token_1 as trade fee"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "enableCreatorFee",
+              "docs": [],
+              "type": {
+                "kind": "booleanTypeNode",
+                "size": {
+                  "kind": "numberTypeNode",
+                  "format": "u8",
+                  "endian": "le"
+                }
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "padding1",
+              "docs": [],
+              "type": {
+                "kind": "fixedSizeTypeNode",
+                "size": 6,
+                "type": {
+                  "kind": "bytesTypeNode"
+                }
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "creatorFeesToken0",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "creatorFeesToken1",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "padding",
+              "docs": [
+                "padding for future updates"
+              ],
+              "type": {
+                "kind": "arrayTypeNode",
+                "item": {
+                  "kind": "numberTypeNode",
+                  "format": "u64",
+                  "endian": "le"
+                },
+                "count": {
+                  "kind": "fixedCountNode",
+                  "value": 28
+                }
+              }
+            }
+          ]
+        },
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      }
+    ],
+    "instructions": [
+      {
+        "kind": "instructionNode",
+        "name": "closePermissionPda",
+        "docs": [
+          "Close a permission account",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx`- The context of accounts",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ",
+              "identifier": "owner"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "permissionAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "permission",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Initialize config state account to store protocol owner address and fee rates."
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "permission",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "7KFQVaN3yS9cCu",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "permissionAuthority",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "permissionAuthority",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "permissionAuthority"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "systemProgram"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "9c5420764587467b",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "collectCreatorFee",
+        "docs": [
+          "Collect the creator fee",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx` - The context of accounts",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "creator",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "Only pool creator can collect fee"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "authority",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "Gzz3FEFF5LQ4sMkDLog6XmBNSXoNUKPSxe5By",
+                      "encoding": "base58"
+                    }
+                  }
+                ]
+              },
+              "seeds": []
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Pool state stores accumulated protocol fee amount"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Amm config account stores fund_owner"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that holds pool tokens for token_0"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that holds pool tokens for token_1"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vault0Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of token_0 vault"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vault1Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of token_1 vault"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "creatorToken0",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that receives the collected token_0 fund fees"
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "creatorToken0",
+                "docs": [],
+                "programId": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+                "seeds": [
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "creator",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "token0Program",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "vault0Mint",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "creator",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "creator"
+                  }
+                },
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "token0Program",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "token0Program"
+                  }
+                },
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "vault0Mint",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "vault0Mint"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "creatorToken1",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that receives the collected token_1 fund fees"
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "creatorToken1",
+                "docs": [],
+                "programId": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+                "seeds": [
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "creator",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "token1Program",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "vault1Mint",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "creator",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "creator"
+                  }
+                },
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "token1Program",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "token1Program"
+                  }
+                },
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "vault1Mint",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "vault1Mint"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Program",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Spl token program or token program 2022"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Program",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Spl token program or token program 2022"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "associatedTokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Program to create an ATA for receiving position NFT"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "identifier": "associatedTokenProgram"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "To create a new program account"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "systemProgram"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "1416567bc61cdb84",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "collectFundFee",
+        "docs": [
+          "Collect the fund fee accrued to the pool",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx` - The context of accounts",
+          "* `amount_0_requested` - The maximum amount of token_0 to send, can be 0 to collect fees in only token_1",
+          "* `amount_1_requested` - The maximum amount of token_1 to send, can be 0 to collect fees in only token_0",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "Only admin or fund_owner can collect fee now"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "authority",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "Gzz3FEFF5LQ4sMkDLog6XmBNSXoNUKPSxe5By",
+                      "encoding": "base58"
+                    }
+                  }
+                ]
+              },
+              "seeds": []
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Pool state stores accumulated protocol fee amount"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Amm config account stores fund_owner"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that holds pool tokens for token_0"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that holds pool tokens for token_1"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vault0Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of token_0 vault"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vault1Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of token_1 vault"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "recipientToken0Account",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that receives the collected token_0 fund fees"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "recipientToken1Account",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that receives the collected token_1 fund fees"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The SPL program to perform token transfers"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "tokenProgram"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram2022",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The SPL program 2022 to perform token transfers"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+              "identifier": "tokenProgram2022"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "a78a4e95dfc2067e",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "amount0Requested",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "amount1Requested",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "collectProtocolFee",
+        "docs": [
+          "Collect the protocol fee accrued to the pool",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx` - The context of accounts",
+          "* `amount_0_requested` - The maximum amount of token_0 to send, can be 0 to collect fees in only token_1",
+          "* `amount_1_requested` - The maximum amount of token_1 to send, can be 0 to collect fees in only token_0",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "Only admin or owner can collect fee now"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "authority",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "Gzz3FEFF5LQ4sMkDLog6XmBNSXoNUKPSxe5By",
+                      "encoding": "base58"
+                    }
+                  }
+                ]
+              },
+              "seeds": []
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Pool state stores accumulated protocol fee amount"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Amm config account stores owner"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that holds pool tokens for token_0"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that holds pool tokens for token_1"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vault0Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of token_0 vault"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vault1Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of token_1 vault"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "recipientToken0Account",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that receives the collected token_0 protocol fees"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "recipientToken1Account",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that receives the collected token_1 protocol fees"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The SPL program to perform token transfers"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "tokenProgram"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram2022",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The SPL program 2022 to perform token transfers"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+              "identifier": "tokenProgram2022"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "8888fcddc2427e59",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "amount0Requested",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "amount1Requested",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "createAmmConfig",
+        "docs": [
+          "# Arguments",
+          "",
+          "* `ctx`- The accounts needed by instruction.",
+          "* `index` - The index of amm config, there may be multiple config.",
+          "* `trade_fee_rate` - Trade fee rate, can be changed.",
+          "* `protocol_fee_rate` - The rate of protocol fee within trade fee.",
+          "* `fund_fee_rate` - The rate of fund fee within trade fee.",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "Address to be set as protocol owner."
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ",
+              "identifier": "owner"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Initialize config state account to store protocol owner address and fee rates."
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "ammConfig",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "6UUN1JEC8xDXQA",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "index",
+                    "docs": [],
+                    "type": {
+                      "kind": "numberTypeNode",
+                      "format": "u16",
+                      "endian": "le"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "index",
+                  "value": {
+                    "kind": "argumentValueNode",
+                    "name": "index"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "systemProgram"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "8934edd4d7756c68",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "index",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u16",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "tradeFeeRate",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "protocolFeeRate",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "fundFeeRate",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "createPoolFee",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "creatorFeeRate",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "createPermissionPda",
+        "docs": [
+          "Create a permission account",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx`- The context of accounts",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ",
+              "identifier": "owner"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "permissionAuthority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "permission",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Initialize config state account to store protocol owner address and fee rates."
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "permission",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "7KFQVaN3yS9cCu",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "permissionAuthority",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "permissionAuthority",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "permissionAuthority"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "systemProgram"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "878802d889a9b5ca",
+              "encoding": "base16"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "deposit",
+        "docs": [
+          "Deposit lp token to the pool",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx`- The context of accounts",
+          "* `lp_token_amount` - Increased number of LPs",
+          "* `maximum_token_0_amount` -  Maximum token 0 amount to deposit, prevents excessive slippage",
+          "* `maximum_token_1_amount` - Maximum token 1 amount to deposit, prevents excessive slippage",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "Pays to mint the position"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "authority",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "Gzz3FEFF5LQ4sMkDLog6XmBNSXoNUKPSxe5By",
+                      "encoding": "base58"
+                    }
+                  }
+                ]
+              },
+              "seeds": []
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ownerLpToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Owner lp token account"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Account",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The payer's token account for token_0"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Account",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The payer's token account for token_1"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that holds pool tokens for token_0"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that holds pool tokens for token_1"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "token Program"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "tokenProgram"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram2022",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Token program 2022"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+              "identifier": "tokenProgram2022"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vault0Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of token_0 vault"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vault1Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of token_1 vault"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "lpMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Lp token mint"
+            ]
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "f223c68952e1f2b6",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "lpTokenAmount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "maximumToken0Amount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "maximumToken1Amount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "initialize",
+        "docs": [
+          "Creates a pool for the given token pair and the initial price",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx`- The context of accounts",
+          "* `init_amount_0` - the initial amount_0 to deposit",
+          "* `init_amount_1` - the initial amount_1 to deposit",
+          "* `open_time` - the timestamp allowed for swap",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "creator",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "Address paying to create the pool. Can be anyone"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Which config the pool belongs to."
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "pool vault and lp mint authority"
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "authority",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "Gzz3FEFF5LQ4sMkDLog6XmBNSXoNUKPSxe5By",
+                      "encoding": "base58"
+                    }
+                  }
+                ]
+              },
+              "seeds": []
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "PDA account:",
+              "seeds = [",
+              "POOL_SEED.as_bytes(),",
+              "amm_config.key().as_ref(),",
+              "token_0_mint.key().as_ref(),",
+              "token_1_mint.key().as_ref(),",
+              "],",
+              "",
+              "Or random account: must be signed by cli"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Token_0 mint, the key must smaller than token_1 mint."
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Token_1 mint, the key must grater then token_0 mint."
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "lpMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "pool lp mint"
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "lpMint",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "384a3oAC6vKjCTVVm",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "poolState",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "poolState",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "poolState"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "creatorToken0",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "payer token0 account"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "creatorToken1",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "creator token1 account"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "creatorLpToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "creator lp token account"
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "creatorLpToken",
+                "docs": [],
+                "programId": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+                "seeds": [
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "creator",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  },
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "lpMint",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "creator",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "creator"
+                  }
+                },
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "lpMint",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "lpMint"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "token0Vault",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "7KNnBe4BgBkKn3",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "poolState",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "token0Mint",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "poolState",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "poolState"
+                  }
+                },
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "token0Mint",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "token0Mint"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "token1Vault",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "7KNnBe4BgBkKn3",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "poolState",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "token1Mint",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "poolState",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "poolState"
+                  }
+                },
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "token1Mint",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "token1Mint"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "createPoolFee",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "create pool fee account"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8",
+              "identifier": "createPoolFee"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "observationState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "an account to store oracle observations"
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "observationState",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "UczdYHS9FUUUEi9",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "poolState",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "poolState",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "poolState"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Program to create mint account and mint tokens"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "tokenProgram"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Program",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Spl token program or token program 2022"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Program",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Spl token program or token program 2022"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "associatedTokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Program to create an ATA for receiving position NFT"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "identifier": "associatedTokenProgram"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "To create a new program account"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "systemProgram"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "rent",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Sysvar for program account"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "SysvarRent111111111111111111111111111111111",
+              "identifier": "rent"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "afaf6d1f0d989bed",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "initAmount0",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "initAmount1",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "openTime",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "initializeWithPermission",
+        "docs": [
+          "Create a pool with permission",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx`- The context of accounts",
+          "* `init_amount_0` - the initial amount_0 to deposit",
+          "* `init_amount_1` - the initial amount_1 to deposit",
+          "* `open_time` - the timestamp allowed for swap",
+          "* `creator_fee_on` - creator fee model, 0：both token0 and token1 (depends on the input), 1: only token0, 2: only token1",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "payer",
+            "isWritable": true,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "Address paying to create the pool. Can be anyone"
+            ],
+            "defaultValue": {
+              "kind": "payerValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "creator",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Which config the pool belongs to."
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "pool vault and lp mint authority"
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "authority",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "Gzz3FEFF5LQ4sMkDLog6XmBNSXoNUKPSxe5By",
+                      "encoding": "base58"
+                    }
+                  }
+                ]
+              },
+              "seeds": []
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "PDA account:",
+              "seeds = [",
+              "POOL_SEED.as_bytes(),",
+              "amm_config.key().as_ref(),",
+              "token_0_mint.key().as_ref(),",
+              "token_1_mint.key().as_ref(),",
+              "],",
+              "",
+              "Or random account: must be signed by cli"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Token_0 mint, the key must smaller than token_1 mint."
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Token_1 mint, the key must grater then token_0 mint."
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "lpMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "pool lp mint"
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "lpMint",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "384a3oAC6vKjCTVVm",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "poolState",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "poolState",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "poolState"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "payerToken0",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "payer token0 account"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "payerToken1",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "payer token1 account"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "payerLpToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "payer lp token account"
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "payerLpToken",
+                "docs": [],
+                "programId": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+                "seeds": [
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "payer",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  },
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "lpMint",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "payer",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "payer"
+                  }
+                },
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "lpMint",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "lpMint"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "token0Vault",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "7KNnBe4BgBkKn3",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "poolState",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "token0Mint",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "poolState",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "poolState"
+                  }
+                },
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "token0Mint",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "token0Mint"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "token1Vault",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "7KNnBe4BgBkKn3",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "poolState",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "token1Mint",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "poolState",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "poolState"
+                  }
+                },
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "token1Mint",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "token1Mint"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "createPoolFee",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "create pool fee account"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8",
+              "identifier": "createPoolFee"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "observationState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "an account to store oracle observations"
+            ],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "observationState",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "UczdYHS9FUUUEi9",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "poolState",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "poolState",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "poolState"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "permission",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "permission",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "7KFQVaN3yS9cCu",
+                      "encoding": "base58"
+                    }
+                  },
+                  {
+                    "kind": "variablePdaSeedNode",
+                    "name": "payer",
+                    "docs": [],
+                    "type": {
+                      "kind": "publicKeyTypeNode"
+                    }
+                  }
+                ]
+              },
+              "seeds": [
+                {
+                  "kind": "pdaSeedValueNode",
+                  "name": "payer",
+                  "value": {
+                    "kind": "accountValueNode",
+                    "name": "payer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Program to create mint account and mint tokens"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "tokenProgram"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Program",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Spl token program or token program 2022"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Program",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Spl token program or token program 2022"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "associatedTokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Program to create an ATA for receiving position NFT"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "identifier": "associatedTokenProgram"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "systemProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "To create a new program account"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "11111111111111111111111111111111",
+              "identifier": "systemProgram"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "3f37fe4131b25979",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "initAmount0",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "initAmount1",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "openTime",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "creatorFeeOn",
+            "docs": [],
+            "type": {
+              "kind": "definedTypeLinkNode",
+              "name": "creatorFeeOn"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "swapBaseInput",
+        "docs": [
+          "Swap the tokens in the pool base input amount",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx`- The context of accounts",
+          "* `amount_in` -  input amount to transfer, output to DESTINATION is based on the exchange rate",
+          "* `minimum_amount_out` -  Minimum amount of output token, prevents excessive slippage",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "payer",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "The user performing the swap"
+            ],
+            "defaultValue": {
+              "kind": "payerValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "authority",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "Gzz3FEFF5LQ4sMkDLog6XmBNSXoNUKPSxe5By",
+                      "encoding": "base58"
+                    }
+                  }
+                ]
+              },
+              "seeds": []
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The factory state to read protocol fees"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The program account of the pool in which the swap will be performed"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The user token account for input token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The user token account for output token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The vault token account for input token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The vault token account for output token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "SPL program for input token transfers"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "SPL program for output token transfers"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenMint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of input token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenMint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of output token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "observationState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The program account for the most recent oracle observation"
+            ]
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "8fbe5adac41e33de",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "amountIn",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "minimumAmountOut",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "swapBaseOutput",
+        "docs": [
+          "Swap the tokens in the pool base output amount",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx`- The context of accounts",
+          "* `max_amount_in` -  input amount prevents excessive slippage",
+          "* `amount_out` -  amount of output token",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "payer",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "The user performing the swap"
+            ],
+            "defaultValue": {
+              "kind": "payerValueNode"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "authority",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "Gzz3FEFF5LQ4sMkDLog6XmBNSXoNUKPSxe5By",
+                      "encoding": "base58"
+                    }
+                  }
+                ]
+              },
+              "seeds": []
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The factory state to read protocol fees"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The program account of the pool in which the swap will be performed"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The user token account for input token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenAccount",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The user token account for output token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The vault token account for input token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputVault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The vault token account for output token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "SPL program for input token transfers"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "SPL program for output token transfers"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "inputTokenMint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of input token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "outputTokenMint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of output token"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "observationState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The program account for the most recent oracle observation"
+            ]
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "37d96256a34ab4ad",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "maxAmountIn",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "amountOut",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "updateAmmConfig",
+        "docs": [
+          "Updates the owner of the amm config",
+          "Must be called by the current owner or admin",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx`- The context of accounts",
+          "* `trade_fee_rate`- The new trade fee rate of amm config, be set when `param` is 0",
+          "* `protocol_fee_rate`- The new protocol fee rate of amm config, be set when `param` is 1",
+          "* `fund_fee_rate`- The new fund fee rate of amm config, be set when `param` is 2",
+          "* `new_owner`- The config's new owner, be set when `param` is 3",
+          "* `new_fund_owner`- The config's new fund owner, be set when `param` is 4",
+          "* `param`- The value can be 0 | 1 | 2 | 3 | 4, otherwise will report a error",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "The amm config owner or admin"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ",
+              "identifier": "owner"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ammConfig",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Amm config account to be changed"
+            ]
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "313cae889a1c74c8",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "param",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u8",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "value",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "updatePoolStatus",
+        "docs": [
+          "Update pool status for given value",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx`- The context of accounts",
+          "* `status` - The value of status",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ",
+              "identifier": "authority"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": []
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "82576c062ee0757b",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "status",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u8",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      },
+      {
+        "kind": "instructionNode",
+        "name": "withdraw",
+        "docs": [
+          "Withdraw lp for token0 and token1",
+          "",
+          "# Arguments",
+          "",
+          "* `ctx`- The context of accounts",
+          "* `lp_token_amount` - Amount of pool tokens to burn. User receives an output of token a and b based on the percentage of the pool tokens that are returned.",
+          "* `minimum_token_0_amount` -  Minimum amount of token 0 to receive, prevents excessive slippage",
+          "* `minimum_token_1_amount` -  Minimum amount of token 1 to receive, prevents excessive slippage",
+          ""
+        ],
+        "optionalAccountStrategy": "programId",
+        "accounts": [
+          {
+            "kind": "instructionAccountNode",
+            "name": "owner",
+            "isWritable": false,
+            "isSigner": true,
+            "isOptional": false,
+            "docs": [
+              "Pays to mint the position"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "authority",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [],
+            "defaultValue": {
+              "kind": "pdaValueNode",
+              "pda": {
+                "kind": "pdaNode",
+                "name": "authority",
+                "docs": [],
+                "seeds": [
+                  {
+                    "kind": "constantPdaSeedNode",
+                    "type": {
+                      "kind": "bytesTypeNode"
+                    },
+                    "value": {
+                      "kind": "bytesValueNode",
+                      "data": "Gzz3FEFF5LQ4sMkDLog6XmBNSXoNUKPSxe5By",
+                      "encoding": "base58"
+                    }
+                  }
+                ]
+              },
+              "seeds": []
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "poolState",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Pool state account"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "ownerLpToken",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Owner lp token account"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Account",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The token account for receive token_0,"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Account",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The token account for receive token_1"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token0Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that holds pool tokens for token_0"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "token1Vault",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The address that holds pool tokens for token_1"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "token Program"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "identifier": "tokenProgram"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "tokenProgram2022",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Token program 2022"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+              "identifier": "tokenProgram2022"
+            }
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vault0Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of token_0 vault"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "vault1Mint",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "The mint of token_1 vault"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "lpMint",
+            "isWritable": true,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "Pool lp token mint"
+            ]
+          },
+          {
+            "kind": "instructionAccountNode",
+            "name": "memoProgram",
+            "isWritable": false,
+            "isSigner": false,
+            "isOptional": false,
+            "docs": [
+              "memo program"
+            ],
+            "defaultValue": {
+              "kind": "publicKeyValueNode",
+              "publicKey": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+              "identifier": "memoProgram"
+            }
+          }
+        ],
+        "arguments": [
+          {
+            "kind": "instructionArgumentNode",
+            "name": "discriminator",
+            "defaultValueStrategy": "omitted",
+            "docs": [],
+            "type": {
+              "kind": "fixedSizeTypeNode",
+              "size": 8,
+              "type": {
+                "kind": "bytesTypeNode"
+              }
+            },
+            "defaultValue": {
+              "kind": "bytesValueNode",
+              "data": "b712469c946da122",
+              "encoding": "base16"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "lpTokenAmount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "minimumToken0Amount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          },
+          {
+            "kind": "instructionArgumentNode",
+            "name": "minimumToken1Amount",
+            "docs": [],
+            "type": {
+              "kind": "numberTypeNode",
+              "format": "u64",
+              "endian": "le"
+            }
+          }
+        ],
+        "discriminators": [
+          {
+            "kind": "fieldDiscriminatorNode",
+            "name": "discriminator",
+            "offset": 0
+          }
+        ]
+      }
+    ],
+    "definedTypes": [
+      {
+        "kind": "definedTypeNode",
+        "name": "creatorFeeOn",
+        "docs": [],
+        "type": {
+          "kind": "enumTypeNode",
+          "variants": [
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "bothToken"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "onlyToken0"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "onlyToken1"
+            }
+          ],
+          "size": {
+            "kind": "numberTypeNode",
+            "format": "u8",
+            "endian": "le"
+          }
+        }
+      },
+      {
+        "kind": "definedTypeNode",
+        "name": "lpChangeEvent",
+        "docs": [
+          "Emitted when deposit and withdraw"
+        ],
+        "type": {
+          "kind": "structTypeNode",
+          "fields": [
+            {
+              "kind": "structFieldTypeNode",
+              "name": "poolId",
+              "docs": [],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "lpAmountBefore",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token0VaultBefore",
+              "docs": [
+                "pool vault sub trade fees"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token1VaultBefore",
+              "docs": [
+                "pool vault sub trade fees"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token0Amount",
+              "docs": [
+                "calculate result without transfer fee"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token1Amount",
+              "docs": [
+                "calculate result without transfer fee"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token0TransferFee",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "token1TransferFee",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "changeType",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u8",
+                "endian": "le"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "definedTypeNode",
+        "name": "observation",
+        "docs": [
+          "The element of observations in ObservationState"
+        ],
+        "type": {
+          "kind": "structTypeNode",
+          "fields": [
+            {
+              "kind": "structFieldTypeNode",
+              "name": "blockTimestamp",
+              "docs": [
+                "The block timestamp of the observation"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "cumulativeToken0PriceX32",
+              "docs": [
+                "the cumulative of token0 price during the duration time, Q32.32, the remaining 64 bit for overflow"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u128",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "cumulativeToken1PriceX32",
+              "docs": [
+                "the cumulative of token1 price during the duration time, Q32.32, the remaining 64 bit for overflow"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u128",
+                "endian": "le"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "definedTypeNode",
+        "name": "swapEvent",
+        "docs": [
+          "Emitted when swap"
+        ],
+        "type": {
+          "kind": "structTypeNode",
+          "fields": [
+            {
+              "kind": "structFieldTypeNode",
+              "name": "poolId",
+              "docs": [],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "inputVaultBefore",
+              "docs": [
+                "pool vault sub trade fees"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "outputVaultBefore",
+              "docs": [
+                "pool vault sub trade fees"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "inputAmount",
+              "docs": [
+                "calculate result without transfer fee"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "outputAmount",
+              "docs": [
+                "calculate result without transfer fee"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "inputTransferFee",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "outputTransferFee",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "baseInput",
+              "docs": [],
+              "type": {
+                "kind": "booleanTypeNode",
+                "size": {
+                  "kind": "numberTypeNode",
+                  "format": "u8",
+                  "endian": "le"
+                }
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "inputMint",
+              "docs": [],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "outputMint",
+              "docs": [],
+              "type": {
+                "kind": "publicKeyTypeNode"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "tradeFee",
+              "docs": [],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "creatorFee",
+              "docs": [
+                "Amount of fee tokens going to creator"
+              ],
+              "type": {
+                "kind": "numberTypeNode",
+                "format": "u64",
+                "endian": "le"
+              }
+            },
+            {
+              "kind": "structFieldTypeNode",
+              "name": "creatorFeeOnInput",
+              "docs": [],
+              "type": {
+                "kind": "booleanTypeNode",
+                "size": {
+                  "kind": "numberTypeNode",
+                  "format": "u8",
+                  "endian": "le"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "pdas": [],
+    "errors": [
+      {
+        "kind": "errorNode",
+        "name": "notApproved",
+        "code": 6000,
+        "message": "Not approved",
+        "docs": [
+          "NotApproved: Not approved"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "invalidOwner",
+        "code": 6001,
+        "message": "Input account owner is not the program address",
+        "docs": [
+          "InvalidOwner: Input account owner is not the program address"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "emptySupply",
+        "code": 6002,
+        "message": "Input token account empty",
+        "docs": [
+          "EmptySupply: Input token account empty"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "invalidInput",
+        "code": 6003,
+        "message": "InvalidInput",
+        "docs": [
+          "InvalidInput: InvalidInput"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "incorrectLpMint",
+        "code": 6004,
+        "message": "Address of the provided lp token mint is incorrect",
+        "docs": [
+          "IncorrectLpMint: Address of the provided lp token mint is incorrect"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "exceededSlippage",
+        "code": 6005,
+        "message": "Exceeds desired slippage limit",
+        "docs": [
+          "ExceededSlippage: Exceeds desired slippage limit"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "zeroTradingTokens",
+        "code": 6006,
+        "message": "Given pool token amount results in zero trading tokens",
+        "docs": [
+          "ZeroTradingTokens: Given pool token amount results in zero trading tokens"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "notSupportMint",
+        "code": 6007,
+        "message": "Not support token_2022 mint extension",
+        "docs": [
+          "NotSupportMint: Not support token_2022 mint extension"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "invalidVault",
+        "code": 6008,
+        "message": "invaild vault",
+        "docs": [
+          "InvalidVault: invaild vault"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "initLpAmountTooLess",
+        "code": 6009,
+        "message": "Init lp amount is too less(Because 100 amount lp will be locked)",
+        "docs": [
+          "InitLpAmountTooLess: Init lp amount is too less(Because 100 amount lp will be locked)"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "transferFeeCalculateNotMatch",
+        "code": 6010,
+        "message": "TransferFee calculate not match",
+        "docs": [
+          "TransferFeeCalculateNotMatch: TransferFee calculate not match"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "mathOverflow",
+        "code": 6011,
+        "message": "Math overflow",
+        "docs": [
+          "MathOverflow: Math overflow"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "insufficientVault",
+        "code": 6012,
+        "message": "Insufficient vault",
+        "docs": [
+          "InsufficientVault: Insufficient vault"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "invalidFeeModel",
+        "code": 6013,
+        "message": "Invalid fee model",
+        "docs": [
+          "InvalidFeeModel: Invalid fee model"
+        ]
+      },
+      {
+        "kind": "errorNode",
+        "name": "noFeeCollect",
+        "code": 6014,
+        "message": "Fee is zero",
+        "docs": [
+          "NoFeeCollect: Fee is zero"
+        ]
+      }
+    ]
+  },
+  "additionalPrograms": []
+}

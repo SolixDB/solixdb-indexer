@@ -1,8 +1,9 @@
+# Multi-stage Dockerfile for optimized Rust build with clang16 (required for rocksdb)
 FROM ubuntu:24.04 AS builder
 
 WORKDIR /app
 
-# Rust + build deps
+# Install Rust + build dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
@@ -14,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# LLVM 16 (via jammy repo)
+# Install LLVM 16 (required for rocksdb)
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -35,10 +36,21 @@ ENV LDFLAGS="-L/usr/lib/llvm-16/lib"
 ENV CPPFLAGS="-I/usr/lib/llvm-16/include"
 ENV PATH="/usr/lib/llvm-16/bin:${PATH}"
 
+# Copy dependency files first for better caching
 COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
+COPY idls ./idls
+
+# Create a dummy src/main.rs to build dependencies
+RUN mkdir -p src && \
+    echo "fn main() {}" > src/main.rs && \
+    cargo build --release && \
+    rm -rf src
+
+# Copy actual source code
 COPY src ./src
 
+# Build the actual application
 RUN --mount=type=cache,target=/root/.cargo/registry \
     --mount=type=cache,target=/root/.cargo/git \
     --mount=type=cache,target=/app/target \
@@ -50,14 +62,19 @@ FROM ubuntu:24.04
 
 WORKDIR /app
 
-# Install runtime dependencies only
+# Install only runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     libssl3 \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy binary from builder stage
+# Copy binary from builder
 COPY --from=builder /app/transaction-parser /app/transaction-parser
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD pgrep -f transaction-parser || exit 1
 
 # Run the application
 ENTRYPOINT ["/app/transaction-parser"]

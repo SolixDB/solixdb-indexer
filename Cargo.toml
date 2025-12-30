@@ -14,46 +14,32 @@ publish = false
 [workspace.dependencies]
 # Core Utilities
 clap = "4.5"
-dashmap = "6.1.0"
-once_cell = "1.21.3"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0" 
 thiserror = "1.0.64"
 tracing = "0.1.43"
 tracing-subscriber = "0.3.22"
 base64 = "0.22"
-zstd = "0.13"
+
+# Proc Macro
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "2.0", features = ["full", "parsing"] }
+codama-nodes = "^0.6"
+prettyplease = "0.2"
 
 # Async
 futures-util = "0.3.31"
-tokio = { version = "1.48.0", features = ["macros", "fs", "sync"] }
+tokio = { version = "1.48.0", features = ["macros", "sync"] }
 
-# Solana v2.x
-solana-account-info = "2.2.0"
-solana-cpi = "2.2.0"
-solana-decode-error = "2.2.0"
-solana-instruction = "2.2.0"
-solana-msg = "2.2.0"
-solana-program-entrypoint = "2.2.0"
-solana-program-error = "2.2.0"
-solana-pubkey = "2.2.0"
-solana-sdk = "2.2.0"
-solana-transaction-status = "2.2.0"
-
-# Solana v3.x
-solana-hash = { version = "3.0.0", features = ["serde"] }
-solana-message = "3.0.1"
-solana-sysvar = { version = "3.0.0", features = ["serde"] }
-
-# Solana Misc
+# Solana
 solana-address = "2.0.0"
+solana-message = "3.0.1"
 
 # Jetstream
 jetstreamer-firehose = "0.2.0"
-jetstreamer-plugin = "0.2.0"
-jetstreamer-utils = "0.2.0"
 
-# Serialization / Proto
+# Serialization
 borsh = "1.5.5"
 prost = "0.13"
 prost-build = "0.13"
@@ -63,30 +49,15 @@ tonic = "0.12.1"
 tonic-build = "0.12"
 tonic-reflection = "0.12"
 
-# Numeric / Enums
-num-derive = "0.4.0"
-num-traits = "0.2.0"
-strum = "0.27"
-strum_macros = "0.27"
-
 # Internal
 yellowstone-vixen-core = { path = "crates/core", version = "0.6.0" }
 yellowstone-vixen-proto = { path = "crates/proto", version = "0.6.0" }
-yellowstone-vixen-pumpfun-parser = { path = "crates/pumpfun-parser", version = "0.6.0" }
-yellowstone-vixen-pump-swaps-parser = { path = "crates/pump-swaps-parser", version = "0.6.0" }
-yellowstone-vixen-raydium-amm-v4-parser = { path = "crates/raydium-amm-v4-parser", version = "0.6.0" }
-yellowstone-vixen-raydium-clmm-parser = { path = "crates/raydium-clmm-parser", version = "0.6.0" }
-yellowstone-vixen-raydium-cpmm-parser = { path = "crates/raydium-cpmm-parser", version = "0.6.0" }
-yellowstone-vixen-raydium-launchpad-parser = { path = "crates/raydium-launchpad-parser", version = "0.6.0" }
-yellowstone-vixen-jupiter-swap-parser = { path = "crates/jupiter-swap-parser", version = "0.6.0" }
-yellowstone-vixen-meteora-amm-parser = { path = "crates/meteora-amm-parser", version = "0.6.0" }
-yellowstone-vixen-moonshot-parser = { path = "crates/moonshot-parser", version = "0.6.0" }
-yellowstone-vixen-orca-whirlpool-parser = { path = "crates/orca-whirlpool-parser", version = "0.6.0" }
-
-clickhouse = "0.14.1"
-hex = "0.4.3"
+yellowstone-vixen-proc-macro = { path = "crates/proc-macro", version = "0.6.0" }
 
 # External
+clickhouse = "0.11"
+chrono = { version = "0.4", features = ["serde"] }
+hex = "0.4.3"
 bs58 = "0.5.1"
 yellowstone-grpc-proto = { version = "9", default-features = false }
 
@@ -99,73 +70,33 @@ version.workspace = true
 repository.workspace = true
 
 [dependencies]
+# Core dependencies
 bs58.workspace = true
 borsh.workspace = true
-clap.workspace = true
-dashmap.workspace = true
-
-futures-util.workspace = true
-
-jetstreamer-firehose.workspace = true
-jetstreamer-plugin.workspace = true
-jetstreamer-utils.workspace = true
-
-num-derive.workspace = true
-num-traits.workspace = true
-
-once_cell.workspace = true
-
-prost.workspace = true
-prost-build.workspace = true
-prost-types.workspace = true
-protobuf-src.workspace = true
-
 serde.workspace = true
 serde_json.workspace = true
 
-solana-account-info.workspace = true
-solana-address.workspace = true
-solana-cpi.workspace = true
-solana-decode-error.workspace = true
-solana-hash.workspace = true
-solana-instruction.workspace = true
-solana-message.workspace = true
-solana-msg.workspace = true
-solana-program-entrypoint.workspace = true
-solana-program-error.workspace = true
-solana-pubkey.workspace = true
-solana-sdk.workspace = true
-solana-sysvar.workspace = true
-solana-transaction-status.workspace = true
-
-strum.workspace = true
-strum_macros.workspace = true
-
-thiserror.workspace = true
-
+# Async
+futures-util.workspace = true
 tokio.workspace = true
-tonic.workspace = true
-tonic-build.workspace = true
-tonic-reflection.workspace = true
 
+# Jetstream
+jetstreamer-firehose.workspace = true
+
+# Solana
+solana-address.workspace = true
+solana-message.workspace = true
+
+# Tracing
 tracing.workspace = true
 tracing-subscriber.workspace = true
 
-yellowstone-grpc-proto.workspace = true
+# Internal crates
 yellowstone-vixen-core.workspace = true
-yellowstone-vixen-proto.workspace = true
-yellowstone-vixen-pumpfun-parser.workspace = true
-yellowstone-vixen-pump-swaps-parser.workspace = true
-yellowstone-vixen-raydium-amm-v4-parser.workspace = true
-yellowstone-vixen-raydium-clmm-parser.workspace = true
-yellowstone-vixen-raydium-cpmm-parser.workspace = true
-yellowstone-vixen-raydium-launchpad-parser.workspace = true
-yellowstone-vixen-jupiter-swap-parser.workspace = true
-yellowstone-vixen-meteora-amm-parser.workspace = true
-yellowstone-vixen-moonshot-parser.workspace = true
-yellowstone-vixen-orca-whirlpool-parser.workspace = true
+yellowstone-vixen-proc-macro.workspace = true
+yellowstone-grpc-proto.workspace = true
 
+# ClickHouse
 clickhouse.workspace = true
-base64.workspace = true
-zstd.workspace = true
+chrono.workspace = true
 hex.workspace = true

@@ -1,8 +1,43 @@
+# Rust build artifacts
 target/
+**/*.rs.bk
+
+# Git
 .git/
 .gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Documentation
 *.md
-*.txt
-.env
+!README.md
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Scripts
+*.sh
+!generate_parallel_indexers.sh
+
+# Test files
+docker-compose.test.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
 *.log
 
+# Temporary files
+tmp/
+temp/
+*.tmp
