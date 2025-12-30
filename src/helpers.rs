@@ -1,5 +1,5 @@
 use crate::multi_parser::{build_full_account_list, extract_instruction_type, try_parse};
-use crate::storage::{ClickHouseStorage, FailedTransaction, Transaction, TransactionPayload};
+use crate::storage::{ClickHouseStorage, FailedTransaction, Transaction};
 use jetstreamer_firehose::firehose::TransactionData;
 use solana_message::VersionedMessage;
 use std::collections::HashMap;
@@ -29,11 +29,21 @@ pub async fn process_transaction(
         VersionedMessage::V0(msg) => &msg.instructions,
     };
 
+    // Check if transaction was successful on-chain
+    // If transaction failed on-chain, skip it entirely (only store successful transactions)
+    // status field is an enum: Ok(()) for success, Err(...) for failure
+    let status_str = format!("{:?}", tx.transaction_status_meta.status);
+    if status_str.starts_with("Err") {
+        // Transaction failed on-chain, skip storing it
+        return Ok(());
+    }
+
     // Extract transaction metadata
     let signature = tx.signature.to_string();
     let fee = tx.transaction_status_meta.fee;
     let compute_units = tx.transaction_status_meta.compute_units_consumed.unwrap_or(0);
     let block_time = GENESIS_TIMESTAMP + ((tx.slot as f64 * SLOT_DURATION_SECONDS) as u64);
+    // Extract log messages for failed transactions (for debugging)
     let log_messages: Vec<String> = tx
         .transaction_status_meta
         .log_messages
@@ -90,7 +100,7 @@ pub async fn process_transaction(
                     // Extract instruction type
                     let instruction_type = extract_instruction_type(&parsed_instruction);
 
-                    // Insert successful transaction
+                    // Insert successful transaction (transaction already verified as successful on-chain above)
                     let tx_record = Transaction {
                         signature: signature.clone(),
                         slot: tx.slot,
@@ -98,7 +108,7 @@ pub async fn process_transaction(
                         program_id: program_id_str.clone(),
                         protocol_name: parser_name.to_string(),
                         instruction_type,
-                        success: 1,
+                        success: 1, // Transaction was successful on-chain
                         fee,
                         compute_units,
                         accounts_count: ix.accounts.len() as u16,
@@ -110,17 +120,8 @@ pub async fn process_transaction(
                         tracing::error!("Failed to insert transaction: {:?}", e);
                     }
 
-                    // Insert payload
-                    let payload = TransactionPayload {
-                        signature: signature.clone(),
-                        parsed_data: parsed_instruction,
-                        raw_data,
-                        log_messages: log_messages_str.clone(),
-                    };
-
-                    if let Err(e) = storage.insert_payload(payload).await {
-                        tracing::error!("Failed to insert payload: {:?}", e);
-                    }
+                    // Note: transaction_payloads table removed to save storage space
+                    // (was 1.32 GiB with no compression benefit, Debug strings aren't queryable)
                 }
                 Err(e) => {
                     if let Some((_, failed)) = metrics.get(*parser_name) {
@@ -136,6 +137,7 @@ pub async fn process_transaction(
                         protocol_name: parser_name.to_string(),
                         raw_data,
                         error_message: format!("{:?}", e),
+                        log_messages: log_messages_str.clone(),
                     };
 
                     if let Err(e) = storage.insert_failed(failed_tx).await {

@@ -26,13 +26,8 @@ pub struct Transaction {
     pub hour: u8,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, clickhouse::Row)]
-pub struct TransactionPayload {
-    pub signature: String,
-    pub parsed_data: String,
-    pub raw_data: String,
-    pub log_messages: String,
-}
+// Removed TransactionPayload - was taking 1.32 GiB with no compression benefit
+// Debug strings aren't queryable and storage is limited (1-2TB)
 
 #[derive(Debug, Clone, Serialize, Deserialize, clickhouse::Row)]
 pub struct FailedTransaction {
@@ -43,12 +38,12 @@ pub struct FailedTransaction {
     pub protocol_name: String,
     pub raw_data: String,
     pub error_message: String,
+    pub log_messages: String,
 }
 
 pub struct ClickHouseStorage {
     client: Client,
     tx_buffer: Arc<Mutex<Vec<Transaction>>>,
-    payload_buffer: Arc<Mutex<Vec<TransactionPayload>>>,
     failed_buffer: Arc<Mutex<Vec<FailedTransaction>>>,
     batch_size: usize,
 }
@@ -65,7 +60,6 @@ impl ClickHouseStorage {
         let storage = Self {
             client: client.clone(),
             tx_buffer: Arc::new(Mutex::new(Vec::new())),
-            payload_buffer: Arc::new(Mutex::new(Vec::new())),
             failed_buffer: Arc::new(Mutex::new(Vec::new())),
             batch_size: 1000,
         };
@@ -84,7 +78,6 @@ impl ClickHouseStorage {
         let storage = Self {
             client: client.clone(),
             tx_buffer: Arc::new(Mutex::new(Vec::new())),
-            payload_buffer: Arc::new(Mutex::new(Vec::new())),
             failed_buffer: Arc::new(Mutex::new(Vec::new())),
             batch_size: 1000,
         };
@@ -177,30 +170,7 @@ impl ClickHouseStorage {
             .await
             .ok();
 
-        // Table 2: transaction_payloads - maximum compression storage
-        self.client
-            .query(
-                r#"
-                CREATE TABLE IF NOT EXISTS transaction_payloads
-                (
-                    signature String,
-                    parsed_data String CODEC(ZSTD(22)),
-                    raw_data String CODEC(ZSTD(22)),
-                    log_messages String CODEC(ZSTD(22))
-                )
-                ENGINE = MergeTree()
-                ORDER BY signature
-                SETTINGS 
-                    index_granularity = 8192,
-                    async_insert = 1,
-                    wait_for_async_insert = 0
-                "#
-            )
-            .execute()
-            .await
-            .map_err(|e| format!("{}", e))?;
-
-        // Table 3: failed_transactions - for debugging
+        // Table 2: failed_transactions - for debugging
         self.client
             .query(
                 r#"
@@ -212,7 +182,8 @@ impl ClickHouseStorage {
                     program_id String,
                     protocol_name String,
                     raw_data String CODEC(ZSTD(22)),
-                    error_message String CODEC(ZSTD(22))
+                    error_message String CODEC(ZSTD(22)),
+                    log_messages String CODEC(ZSTD(22))
                 )
                 ENGINE = MergeTree()
                 ORDER BY (slot, signature)
@@ -233,11 +204,6 @@ impl ClickHouseStorage {
     async fn drop_all_tables(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         self.client
             .query("DROP TABLE IF EXISTS transactions")
-            .execute()
-            .await
-            .map_err(|e| format!("{}", e))?;
-        self.client
-            .query("DROP TABLE IF EXISTS transaction_payloads")
             .execute()
             .await
             .map_err(|e| format!("{}", e))?;
@@ -263,25 +229,6 @@ impl ClickHouseStorage {
                 error!("Failed to flush transactions batch: {:?}", e);
                 // Re-add to buffer on error
                 let mut buffer = self.tx_buffer.lock().await;
-                buffer.extend(batch);
-            }
-        }
-
-        Ok(())
-    }
-
-    /// Insert a transaction payload (batched)
-    pub async fn insert_payload(&self, payload: TransactionPayload) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let mut buffer = self.payload_buffer.lock().await;
-        buffer.push(payload);
-
-        if buffer.len() >= self.batch_size {
-            let batch = buffer.drain(..).collect::<Vec<_>>();
-            drop(buffer);
-
-            if let Err(e) = self.flush_payloads_batch(&batch).await {
-                error!("Failed to flush payloads batch: {:?}", e);
-                let mut buffer = self.payload_buffer.lock().await;
                 buffer.extend(batch);
             }
         }
@@ -348,46 +295,6 @@ impl ClickHouseStorage {
         Ok(())
     }
 
-    async fn flush_payloads_batch(&self, batch: &[TransactionPayload]) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        if batch.is_empty() {
-            return Ok(());
-        }
-        
-        // Retry logic for production resilience
-        let max_retries = 3;
-        let mut last_error = None;
-        
-        for attempt in 1..=max_retries {
-            match self.try_insert_payloads(batch).await {
-                Ok(()) => return Ok(()),
-                Err(e) => {
-                    last_error = Some(e);
-                    if attempt < max_retries {
-                        let delay_ms = 1000 * attempt;
-                        error!("Failed to insert payloads batch (attempt {}/{}), retrying in {}ms...", 
-                            attempt, max_retries, delay_ms);
-                        tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms)).await;
-                    }
-                }
-            }
-        }
-        
-        Err(format!("Failed to insert payloads after {} retries: {:?}", 
-            max_retries, last_error).into())
-    }
-    
-    async fn try_insert_payloads(&self, batch: &[TransactionPayload]) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let mut inserter = self.client.insert("transaction_payloads")
-            .map_err(|e| format!("{}", e))?;
-        for payload in batch {
-            inserter.write(payload).await
-                .map_err(|e| format!("{}", e))?;
-        }
-        inserter.end().await
-            .map_err(|e| format!("{}", e))?;
-        Ok(())
-    }
-
     async fn flush_failed_batch(&self, batch: &[FailedTransaction]) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         if batch.is_empty() {
             return Ok(());
@@ -444,17 +351,6 @@ impl ClickHouseStorage {
             info!("Flushed {} transactions", tx_batch.len());
         }
 
-        // Flush payloads
-        let payload_batch = {
-            let mut buffer = self.payload_buffer.lock().await;
-            buffer.drain(..).collect::<Vec<_>>()
-        };
-        if !payload_batch.is_empty() {
-            self.flush_payloads_batch(&payload_batch).await
-                .map_err(|e| format!("{}", e))?;
-            info!("Flushed {} payloads", payload_batch.len());
-        }
-
         // Flush failed
         let failed_batch = {
             let mut buffer = self.failed_buffer.lock().await;
@@ -494,7 +390,7 @@ impl ClickHouseStorage {
                     sum(bytes_on_disk) / greatest(sum(rows), 1) as bytes_per_row
                 FROM system.parts
                 WHERE database = currentDatabase() 
-                    AND table IN ('transactions', 'transaction_payloads', 'failed_transactions')
+                    AND table IN ('transactions', 'failed_transactions')
                     AND active = 1
                 GROUP BY table
                 ORDER BY table
@@ -524,7 +420,7 @@ impl ClickHouseStorage {
                     sum(data_uncompressed_bytes) as uncompressed_bytes
                 FROM system.parts
                 WHERE database = currentDatabase() 
-                    AND table IN ('transactions', 'transaction_payloads', 'failed_transactions')
+                    AND table IN ('transactions', 'failed_transactions')
                     AND active = 1
                 GROUP BY table
                 HAVING uncompressed_bytes > 0
