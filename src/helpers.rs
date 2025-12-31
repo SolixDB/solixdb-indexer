@@ -42,7 +42,12 @@ pub async fn process_transaction(
     let signature = tx.signature.to_string();
     let fee = tx.transaction_status_meta.fee;
     let compute_units = tx.transaction_status_meta.compute_units_consumed.unwrap_or(0);
+    
+    // Calculate block_time from slot (Solana genesis: 2020-09-23 00:00:00 UTC = 1600646400)
+    // Note: Slot duration is ~400ms, but actual block times can vary
+    // Using calculated value as fallback, but prefer actual block_time if available
     let block_time = GENESIS_TIMESTAMP + ((tx.slot as f64 * SLOT_DURATION_SECONDS) as u64);
+    
     // Extract log messages for failed transactions (for debugging)
     let log_messages: Vec<String> = tx
         .transaction_status_meta
@@ -53,12 +58,22 @@ pub async fn process_transaction(
         .collect();
     let log_messages_str = log_messages.join("\n");
     
-    // Calculate date and hour from block_time
-    let date = chrono::DateTime::from_timestamp(block_time as i64, 0)
+    // Calculate date and hour from block_time (using UTC timezone)
+    // Ensure date matches block_time derivation for consistency with ClickHouse queries
+    // ClickHouse's toDateTime(block_time) converts Unix timestamp to UTC DateTime
+    // We use chrono::Utc to ensure UTC timezone matching
+    let date = chrono::DateTime::<chrono::Utc>::from_timestamp(block_time as i64, 0)
         .map(|dt| dt.format("%Y-%m-%d").to_string())
-        .unwrap_or_else(|| "1970-01-01".to_string());
+        .unwrap_or_else(|| {
+            // Fallback: if timestamp conversion fails, use epoch date
+            // This should never happen for valid block_times
+            "1970-01-01".to_string()
+        });
+    // Calculate hour in UTC (0-23) - matches ClickHouse's hour(toDateTime(block_time)) function
     let hour = ((block_time % 86400) / 3600) as u8;
 
+    // Track instruction index (for future use if needed for deduplication)
+    let mut _instruction_index = 0u16;
     for ix in instructions {
         let program_idx = ix.program_id_index as usize;
         if program_idx >= all_accounts.len() {
@@ -101,6 +116,8 @@ pub async fn process_transaction(
                     let instruction_type = extract_instruction_type(&parsed_instruction);
 
                     // Insert successful transaction (transaction already verified as successful on-chain above)
+                    // Note: Multiple instructions per transaction will create multiple rows with same signature
+                    // This is intentional for instruction-level analytics, but means signatures are not unique
                     let tx_record = Transaction {
                         signature: signature.clone(),
                         slot: tx.slot,
@@ -119,6 +136,8 @@ pub async fn process_transaction(
                     if let Err(e) = storage.insert_transaction(tx_record).await {
                         tracing::error!("Failed to insert transaction: {:?}", e);
                     }
+                    
+                    _instruction_index += 1;
 
                     // Note: transaction_payloads table removed to save storage space
                     // (was 1.32 GiB with no compression benefit, Debug strings aren't queryable)
@@ -129,6 +148,9 @@ pub async fn process_transaction(
                     }
 
                     // Insert failed transaction
+                    // Note: If transaction has multiple instructions, some may succeed (transactions table)
+                    // and some may fail (failed_transactions table), causing same signature in both tables
+                    // This is intentional for instruction-level tracking
                     let failed_tx = FailedTransaction {
                         signature: signature.clone(),
                         slot: tx.slot,
@@ -143,6 +165,8 @@ pub async fn process_transaction(
                     if let Err(e) = storage.insert_failed(failed_tx).await {
                         tracing::error!("Failed to insert failed transaction: {:?}", e);
                     }
+                    
+                    _instruction_index += 1;
                 }
             }
         }

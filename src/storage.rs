@@ -129,7 +129,8 @@ impl ClickHouseStorage {
                 SETTINGS 
                     index_granularity = 8192,
                     async_insert = 1,
-                    wait_for_async_insert = 0
+                    wait_for_async_insert = 1,
+                    async_insert_busy_timeout_ms = 300000
                 "#
             )
             .execute()
@@ -190,7 +191,8 @@ impl ClickHouseStorage {
                 SETTINGS 
                     index_granularity = 8192,
                     async_insert = 1,
-                    wait_for_async_insert = 0
+                    wait_for_async_insert = 1,
+                    async_insert_busy_timeout_ms = 300000
                 "#
             )
             .execute()

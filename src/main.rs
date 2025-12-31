@@ -70,7 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             _ = sigint.recv() => {
                 tracing::info!("Received SIGINT, initiating graceful shutdown...");
-            }
+    }
         }
         
         shutdown_flag_clone.store(true, Ordering::Relaxed);
@@ -138,7 +138,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let start_time = Instant::now();
     let start_timestamp = std::time::SystemTime::now();
-    
+
     let firehose_result = firehose(
         threads as u64,
         slot_start..slot_end,
@@ -154,7 +154,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         None,
     )
     .await;
-    
+
     match firehose_result {
         Ok(_) => {
             let end_time = Instant::now();

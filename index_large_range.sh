@@ -1,167 +1,235 @@
 #!/bin/bash
 
-# Automated large-range indexer with chunking and resume capability
-# Processes 6.5M slots in manageable chunks, can resume if interrupted
-#
-# Usage: ./index_large_range.sh [clickhouse_url] [threads_per_process] [chunk_size] [processes_per_chunk]
-#
-# Example: ./index_large_range.sh http://localhost:8123 4 500000 20
-
 set -euo pipefail
 
-# Colors
+# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m'
+NC='\033[0m' # No Color
 
-# Configuration
-START_SLOT=377107390
-END_SLOT=383639270
-CLICKHOUSE_URL=${1:-"http://localhost:8123"}
-THREADS_PER_PROCESS=${2:-4}
-CHUNK_SIZE=${3:-500000}  # 500k slots per chunk (safe size)
-PROCESSES_PER_CHUNK=${4:-20}  # 20 parallel processes per chunk
+# Default values
+DEFAULT_CHUNK_SIZE=10000
+DEFAULT_NUM_PROCESSES=4
+DEFAULT_THREADS=4
 
-# State tracking
-STATE_FILE=".index_state"
-LOG_DIR="logs/large_range"
-PROGRESS_LOG="$LOG_DIR/progress.log"
+# Parse arguments
+START_SLOT=${1:-}
+END_SLOT=${2:-}
+CHUNK_SIZE=${3:-$DEFAULT_CHUNK_SIZE}
+NUM_PROCESSES=${4:-$DEFAULT_NUM_PROCESSES}
+THREADS_PER_PROCESS=${5:-$DEFAULT_THREADS}
+CLICKHOUSE_URL=${6:-""}
 
-# Create log directory
-mkdir -p "$LOG_DIR"
-
-# Load state if exists
-if [ -f "$STATE_FILE" ]; then
-    CURRENT_CHUNK_START=$(cat "$STATE_FILE")
-    echo -e "${YELLOW}Resuming from saved state: chunk starting at $CURRENT_CHUNK_START${NC}"
-else
-    CURRENT_CHUNK_START=$START_SLOT
-    echo "$CURRENT_CHUNK_START" > "$STATE_FILE"
+# Validate required arguments
+if [ -z "$START_SLOT" ] || [ -z "$END_SLOT" ]; then
+    echo -e "${RED}Error: START_SLOT and END_SLOT are required${NC}"
+    echo "Usage: $0 <start_slot> <end_slot> [chunk_size] [num_processes] [threads_per_process] [clickhouse_url]"
+    exit 1
 fi
 
-# Calculate total chunks
+# Validate inputs
+if ! [[ "$START_SLOT" =~ ^[0-9]+$ ]]; then
+    echo -e "${RED}Error: START_SLOT must be a number${NC}"
+    exit 1
+fi
+
+if ! [[ "$END_SLOT" =~ ^[0-9]+$ ]]; then
+    echo -e "${RED}Error: END_SLOT must be a number${NC}"
+    exit 1
+fi
+
+if ! [[ "$CHUNK_SIZE" =~ ^[0-9]+$ ]] || [ "$CHUNK_SIZE" -lt 100 ]; then
+    echo -e "${RED}Error: CHUNK_SIZE must be at least 100${NC}"
+    exit 1
+fi
+
+if ! [[ "$NUM_PROCESSES" =~ ^[0-9]+$ ]] || [ "$NUM_PROCESSES" -lt 1 ]; then
+    echo -e "${RED}Error: NUM_PROCESSES must be at least 1${NC}"
+    exit 1
+fi
+
+if [ "$START_SLOT" -ge "$END_SLOT" ]; then
+    echo -e "${RED}Error: START_SLOT ($START_SLOT) must be less than END_SLOT ($END_SLOT)${NC}"
+    exit 1
+fi
+
+# Calculate total slots and chunks
 TOTAL_SLOTS=$((END_SLOT - START_SLOT))
 TOTAL_CHUNKS=$(( (TOTAL_SLOTS + CHUNK_SIZE - 1) / CHUNK_SIZE ))
-REMAINING_SLOTS=$((END_SLOT - CURRENT_CHUNK_START))
-REMAINING_CHUNKS=$(( (REMAINING_SLOTS + CHUNK_SIZE - 1) / CHUNK_SIZE ))
 
-echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}Large Range Indexer${NC}"
-echo -e "${BLUE}========================================${NC}"
-echo -e "Total Range:     $START_SLOT to $END_SLOT ($TOTAL_SLOTS slots)"
-echo -e "Chunk Size:      $CHUNK_SIZE slots"
-echo -e "Processes/Chunk: $PROCESSES_PER_CHUNK"
-echo -e "Threads/Process: $THREADS_PER_PROCESS"
-echo -e "ClickHouse URL:  $CLICKHOUSE_URL"
-echo -e "Starting From:   $CURRENT_CHUNK_START"
-echo -e "Remaining:       $REMAINING_CHUNKS chunks ($REMAINING_SLOTS slots)"
-echo -e "${BLUE}========================================${NC}"
+# State file for resume capability
+STATE_DIR="logs/large_range"
+STATE_FILE="$STATE_DIR/.index_state"
+PROGRESS_LOG="$STATE_DIR/progress.log"
+
+# Create directories
+mkdir -p "$STATE_DIR"
+mkdir -p logs
+
+# Load previous state if exists
+CURRENT_CHUNK=1
+CURRENT_START=$START_SLOT
+
+if [ -f "$STATE_FILE" ]; then
+    echo -e "${YELLOW}Found previous state file. Resuming...${NC}"
+    source "$STATE_FILE"
+    echo -e "${GREEN}Resuming from chunk $CURRENT_CHUNK/$TOTAL_CHUNKS (slot $CURRENT_START)${NC}"
+    echo ""
+else
+    echo -e "${GREEN}Starting fresh indexing job${NC}"
+    echo ""
+fi
+
+# Log function
+log() {
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] $1" | tee -a "$PROGRESS_LOG"
+}
+
+# Save state function
+save_state() {
+    cat > "$STATE_FILE" <<EOF
+CURRENT_CHUNK=$CURRENT_CHUNK
+CURRENT_START=$CURRENT_START
+EOF
+}
+
+# Print configuration
+echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}Large Range Indexer${NC}"
+echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
+echo -e "${YELLOW}Configuration:${NC}"
+echo "  Total Slot Range: $START_SLOT to $END_SLOT"
+echo "  Total Slots: $TOTAL_SLOTS"
+echo "  Chunk Size: $CHUNK_SIZE slots"
+echo "  Total Chunks: $TOTAL_CHUNKS"
+echo "  Processes per Chunk: $NUM_PROCESSES"
+echo "  Threads per Process: $THREADS_PER_PROCESS"
+if [ -n "$CLICKHOUSE_URL" ]; then
+    echo "  ClickHouse URL: $CLICKHOUSE_URL"
+else
+    echo "  ClickHouse URL: (will use config.toml or default)"
+fi
+echo "  State File: $STATE_FILE"
+echo "  Progress Log: $PROGRESS_LOG"
+echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
 echo ""
 
-# Log start
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting large range indexer" >> "$PROGRESS_LOG"
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Range: $START_SLOT to $END_SLOT" >> "$PROGRESS_LOG"
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Resuming from: $CURRENT_CHUNK_START" >> "$PROGRESS_LOG"
+log "Starting large range indexing: $START_SLOT to $END_SLOT"
+log "Chunk size: $CHUNK_SIZE, Processes: $NUM_PROCESSES, Threads: $THREADS_PER_PROCESS"
 
-CHUNK_NUM=1
-CURRENT_START=$CURRENT_CHUNK_START
+# Process chunks
+CHUNK_START=$CURRENT_START
+FIRST_CHUNK=$CURRENT_CHUNK
 
-while [ $CURRENT_START -lt $END_SLOT ]; do
-    # Calculate chunk end
-    CHUNK_END=$((CURRENT_START + CHUNK_SIZE))
+while [ $CHUNK_START -lt $END_SLOT ]; do
+    CHUNK_END=$((CHUNK_START + CHUNK_SIZE))
     if [ $CHUNK_END -gt $END_SLOT ]; then
         CHUNK_END=$END_SLOT
     fi
     
-    CHUNK_SLOTS=$((CHUNK_END - CURRENT_START))
+    CHUNK_SLOTS=$((CHUNK_END - CHUNK_START))
+    PERCENTAGE=$(( (CHUNK_START - START_SLOT) * 100 / TOTAL_SLOTS ))
     
     echo ""
-    echo -e "${GREEN}========================================${NC}"
-    echo -e "${GREEN}Processing Chunk $CHUNK_NUM/$REMAINING_CHUNKS${NC}"
-    echo -e "${GREEN}========================================${NC}"
-    echo -e "Range: $CURRENT_START to $CHUNK_END ($CHUNK_SLOTS slots)"
-    echo -e "Time:  $(date '+%Y-%m-%d %H:%M:%S')"
-    echo ""
+    echo -e "${BLUE}───────────────────────────────────────────────────────────────${NC}"
+    echo -e "${GREEN}Processing Chunk $CURRENT_CHUNK/$TOTAL_CHUNKS${NC}"
+    echo -e "${YELLOW}  Slot Range: $CHUNK_START to $CHUNK_END ($CHUNK_SLOTS slots)${NC}"
+    echo -e "${YELLOW}  Overall Progress: $PERCENTAGE% ($(($CHUNK_START - $START_SLOT))/$TOTAL_SLOTS slots)${NC}"
+    echo -e "${BLUE}───────────────────────────────────────────────────────────────${NC}"
     
-    # Log chunk start
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting chunk $CHUNK_NUM: $CURRENT_START to $CHUNK_END" >> "$PROGRESS_LOG"
+    log "Starting chunk $CURRENT_CHUNK/$TOTAL_CHUNKS: slots $CHUNK_START to $CHUNK_END"
     
-    # Determine if we should clear DB (only first chunk)
-    if [ $CURRENT_START -eq $START_SLOT ]; then
-        CLEAR_DB="true"
+    # Never clear DB automatically - user will do it manually
+    CLEAR_DB="false"
+    
+    # Build command
+    # run_parallel_indexers.sh: <start> <end> <processes> [threads] [clickhouse_url] [clear_db]
+    CMD="./run_parallel_indexers.sh $CHUNK_START $CHUNK_END $NUM_PROCESSES $THREADS_PER_PROCESS"
+    if [ -n "$CLICKHOUSE_URL" ]; then
+        CMD="$CMD \"$CLICKHOUSE_URL\" $CLEAR_DB"
     else
-        CLEAR_DB="false"
+        # If no ClickHouse URL, we can't pass clear_db as 6th arg without URL as 5th
+        # So we'll rely on run_parallel_indexers.sh default behavior (first process clears)
+        # But since we set CLEAR_DB=false, we need to pass it somehow
+        # Actually, if CLICKHOUSE_URL is empty, we should just not pass clear_db
+        # and let run_parallel_indexers.sh use its default (first=true, others=false)
+        # But we want all to be false, so we need to pass empty string for URL
+        CMD="$CMD \"\" $CLEAR_DB"
     fi
     
     # Run the chunk
     CHUNK_START_TIME=$(date +%s)
-    
-    if ./run_parallel_indexers.sh "$CURRENT_START" "$CHUNK_END" "$PROCESSES_PER_CHUNK" "$THREADS_PER_PROCESS" "$CLICKHOUSE_URL" "$CLEAR_DB" >> "$LOG_DIR/chunk_${CHUNK_NUM}.log" 2>&1; then
+    if eval "$CMD"; then
         CHUNK_END_TIME=$(date +%s)
         CHUNK_DURATION=$((CHUNK_END_TIME - CHUNK_START_TIME))
+        CHUNK_MINUTES=$((CHUNK_DURATION / 60))
+        CHUNK_SECONDS=$((CHUNK_DURATION % 60))
         
-        echo -e "${GREEN}✓ Chunk $CHUNK_NUM completed successfully${NC}"
-        echo -e "  Duration: ${CHUNK_DURATION}s (~$((CHUNK_DURATION / 60)) minutes)"
-        echo ""
+        echo -e "${GREEN}✓ Chunk $CURRENT_CHUNK completed in ${CHUNK_MINUTES}m ${CHUNK_SECONDS}s${NC}"
+        log "Chunk $CURRENT_CHUNK completed successfully in ${CHUNK_MINUTES}m ${CHUNK_SECONDS}s"
         
-        # Log success
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Chunk $CHUNK_NUM completed in ${CHUNK_DURATION}s" >> "$PROGRESS_LOG"
+        # Update state for next chunk
+        CURRENT_CHUNK=$((CURRENT_CHUNK + 1))
+        CHUNK_START=$CHUNK_END
+        save_state
         
-        # Update state
-        CURRENT_START=$CHUNK_END
-        echo "$CURRENT_START" > "$STATE_FILE"
-        
-        # Calculate progress
-        PROCESSED_SLOTS=$((CURRENT_START - START_SLOT))
-        PROGRESS_PCT=$((PROCESSED_SLOTS * 100 / TOTAL_SLOTS))
-        echo -e "${BLUE}Overall Progress: $PROGRESS_PCT% ($PROCESSED_SLOTS / $TOTAL_SLOTS slots)${NC}"
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Progress: $PROGRESS_PCT% ($PROCESSED_SLOTS / $TOTAL_SLOTS slots)" >> "$PROGRESS_LOG"
-        
-        CHUNK_NUM=$((CHUNK_NUM + 1))
-        
-        # Small delay between chunks to avoid overwhelming the system
-        sleep 5
+        # Estimate remaining time
+        if [ $CURRENT_CHUNK -le $TOTAL_CHUNKS ]; then
+            REMAINING_CHUNKS=$((TOTAL_CHUNKS - CURRENT_CHUNK + 1))
+            ESTIMATED_SECONDS=$((REMAINING_CHUNKS * CHUNK_DURATION))
+            ESTIMATED_HOURS=$((ESTIMATED_SECONDS / 3600))
+            ESTIMATED_MINUTES=$(( (ESTIMATED_SECONDS % 3600) / 60 ))
+            echo -e "${YELLOW}  Estimated time remaining: ~${ESTIMATED_HOURS}h ${ESTIMATED_MINUTES}m${NC}"
+        fi
     else
-        CHUNK_END_TIME=$(date +%s)
-        CHUNK_DURATION=$((CHUNK_END_TIME - CHUNK_START_TIME))
-        
-        echo -e "${RED}✗ Chunk $CHUNK_NUM failed after ${CHUNK_DURATION}s${NC}"
-        echo -e "${YELLOW}Check logs: $LOG_DIR/chunk_${CHUNK_NUM}.log${NC}"
+        EXIT_CODE=$?
+        echo -e "${RED}✗ Chunk $CURRENT_CHUNK failed with exit code $EXIT_CODE${NC}"
+        log "ERROR: Chunk $CURRENT_CHUNK failed with exit code $EXIT_CODE"
+        log "State saved. You can resume by running this script again."
         echo ""
-        
-        # Log failure
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Chunk $CHUNK_NUM failed after ${CHUNK_DURATION}s" >> "$PROGRESS_LOG"
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] State saved at: $CURRENT_START" >> "$PROGRESS_LOG"
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] To resume, run this script again" >> "$PROGRESS_LOG"
-        
-        echo -e "${YELLOW}Script will exit. To resume, run:${NC}"
-        echo -e "${YELLOW}  ./index_large_range.sh $CLICKHOUSE_URL $THREADS_PER_PROCESS $CHUNK_SIZE $PROCESSES_PER_CHUNK${NC}"
-        echo ""
-        echo -e "${YELLOW}Or check the error and fix it, then resume.${NC}"
-        
-        exit 1
+        echo -e "${YELLOW}Chunk failed. State has been saved.${NC}"
+        echo -e "${YELLOW}To resume, simply run this script again with the same parameters.${NC}"
+        exit $EXIT_CODE
     fi
 done
 
-# All done!
+# Completion
+FINAL_TIME=$(date +%s)
+if [ -f "$STATE_FILE" ]; then
+    START_TIME=$(stat -f %B "$STATE_FILE" 2>/dev/null || stat -c %Y "$STATE_FILE" 2>/dev/null || echo $FINAL_TIME)
+    TOTAL_DURATION=$((FINAL_TIME - START_TIME))
+else
+    TOTAL_DURATION=0
+fi
+
+TOTAL_HOURS=$((TOTAL_DURATION / 3600))
+TOTAL_MINUTES=$(( (TOTAL_DURATION % 3600) / 60 ))
+
 echo ""
-echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}🎉 All chunks completed successfully!${NC}"
-echo -e "${GREEN}========================================${NC}"
-echo -e "Total Range: $START_SLOT to $END_SLOT"
-echo -e "Total Chunks: $CHUNK_NUM"
-echo -e "Completed: $(date '+%Y-%m-%d %H:%M:%S')"
+echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}✓ All chunks completed successfully!${NC}"
+echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
+echo -e "${YELLOW}Total slots indexed: $TOTAL_SLOTS${NC}"
+echo -e "${YELLOW}Total chunks processed: $TOTAL_CHUNKS${NC}"
+if [ $TOTAL_DURATION -gt 0 ]; then
+    echo -e "${YELLOW}Total time: ${TOTAL_HOURS}h ${TOTAL_MINUTES}m${NC}"
+fi
 echo ""
 
-# Log completion
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ All chunks completed successfully!" >> "$PROGRESS_LOG"
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Total chunks: $CHUNK_NUM" >> "$PROGRESS_LOG"
+log "SUCCESS: All chunks completed! Total slots: $TOTAL_SLOTS"
 
-# Clean up state file
-rm -f "$STATE_FILE"
+# Clean up state file on success
+if [ -f "$STATE_FILE" ]; then
+    rm "$STATE_FILE"
+    log "State file cleaned up"
+fi
 
-echo -e "${BLUE}Check progress log: $PROGRESS_LOG${NC}"
-echo -e "${BLUE}Check individual chunk logs: $LOG_DIR/chunk_*.log${NC}"
+echo -e "${GREEN}Check your ClickHouse database for the indexed data!${NC}"
+echo -e "${YELLOW}Query example: SELECT count() FROM transactions;${NC}"
+echo ""
+
+exit 0
 
