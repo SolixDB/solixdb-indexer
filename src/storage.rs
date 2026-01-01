@@ -22,8 +22,6 @@ pub struct Transaction {
     pub fee: u64,
     pub compute_units: u64,
     pub accounts_count: u16,
-    pub date: String,
-    pub hour: u8,
 }
 
 // Removed TransactionPayload - was taking 1.32 GiB with no compression benefit
@@ -57,11 +55,12 @@ impl ClickHouseStorage {
     /// - `https://username:password@host:port` (with TLS)
     pub async fn new(url: &str) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
         let client = Client::default().with_url(url);
+        let batch_size = 50000;
         let storage = Self {
             client: client.clone(),
-            tx_buffer: Arc::new(Mutex::new(Vec::new())),
-            failed_buffer: Arc::new(Mutex::new(Vec::new())),
-            batch_size: 1000,
+            tx_buffer: Arc::new(Mutex::new(Vec::with_capacity(batch_size))),
+            failed_buffer: Arc::new(Mutex::new(Vec::with_capacity(batch_size))),
+            batch_size,
         };
         
         // Health check: verify connection before proceeding
@@ -75,11 +74,12 @@ impl ClickHouseStorage {
     /// Create storage instance and clear existing tables (for testing)
     pub async fn new_with_clear(url: &str) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
         let client = Client::default().with_url(url);
+        let batch_size = 50000;
         let storage = Self {
             client: client.clone(),
-            tx_buffer: Arc::new(Mutex::new(Vec::new())),
-            failed_buffer: Arc::new(Mutex::new(Vec::new())),
-            batch_size: 1000,
+            tx_buffer: Arc::new(Mutex::new(Vec::with_capacity(batch_size))),
+            failed_buffer: Arc::new(Mutex::new(Vec::with_capacity(batch_size))),
+            batch_size,
         };
         
         // Health check: verify connection before proceeding
@@ -113,18 +113,18 @@ impl ClickHouseStorage {
                     signature String,
                     slot UInt64,
                     block_time UInt64,
-                    program_id String,
+                    program_id LowCardinality(String),
                     protocol_name LowCardinality(String),
                     instruction_type LowCardinality(String),
                     success UInt8,
                     fee UInt64,
                     compute_units UInt64,
                     accounts_count UInt16,
-                    date String CODEC(ZSTD(3)),
-                    hour UInt8
+                    date Date MATERIALIZED toDate(block_time),
+                    hour UInt8 MATERIALIZED toHour(toDateTime(block_time))
                 )
                 ENGINE = MergeTree()
-                PARTITION BY toYYYYMM(toDateTime(block_time))
+                PARTITION BY toYYYYMM(date)
                 ORDER BY (date, slot, signature)
                 SETTINGS 
                     index_granularity = 8192,

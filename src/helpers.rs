@@ -58,19 +58,8 @@ pub async fn process_transaction(
         .collect();
     let log_messages_str = log_messages.join("\n");
     
-    // Calculate date and hour from block_time (using UTC timezone)
-    // Ensure date matches block_time derivation for consistency with ClickHouse queries
-    // ClickHouse's toDateTime(block_time) converts Unix timestamp to UTC DateTime
-    // We use chrono::Utc to ensure UTC timezone matching
-    let date = chrono::DateTime::<chrono::Utc>::from_timestamp(block_time as i64, 0)
-        .map(|dt| dt.format("%Y-%m-%d").to_string())
-        .unwrap_or_else(|| {
-            // Fallback: if timestamp conversion fails, use epoch date
-            // This should never happen for valid block_times
-            "1970-01-01".to_string()
-        });
-    // Calculate hour in UTC (0-23) - matches ClickHouse's hour(toDateTime(block_time)) function
-    let hour = ((block_time % 86400) / 3600) as u8;
+    // Date and hour are now calculated automatically by ClickHouse using MATERIALIZED columns
+    // No need to calculate them in Rust - ClickHouse will compute them from block_time
 
     // Track instruction index (for future use if needed for deduplication)
     let mut _instruction_index = 0u16;
@@ -129,8 +118,6 @@ pub async fn process_transaction(
                         fee,
                         compute_units,
                         accounts_count: ix.accounts.len() as u16,
-                        date: date.clone(),
-                        hour,
                     };
 
                     if let Err(e) = storage.insert_transaction(tx_record).await {

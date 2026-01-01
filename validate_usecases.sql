@@ -25,6 +25,14 @@
 -- - Better granularity for analytics dashboards
 -- - Per-instruction error tracking
 --
+-- IMPORTANT: Schema - MATERIALIZED Columns
+-- =========================================
+-- The `date` and `hour` columns are MATERIALIZED and automatically calculated:
+-- - date: Date MATERIALIZED toDate(block_time)
+-- - hour: UInt8 MATERIALIZED toHour(toDateTime(block_time))
+-- These are computed by ClickHouse from block_time, ensuring 100% consistency.
+-- No need to calculate or validate these in application code.
+--
 -- Run these queries periodically to ensure data quality for production APIs.
 -- ============================================================================
 
@@ -76,17 +84,18 @@ SELECT
     AVG(compute_units) AS avg_compute_units
 FROM transactions
 WHERE protocol_name = 'Jupiter'
-    AND date >= '2024-01-01'
+    AND date >= toDate('2024-01-01')
 GROUP BY protocol_name;
 
--- 1.5 Data Completeness: Check date field is properly formatted (YYYY-MM-DD)
+-- 1.5 Data Completeness: Check date field is valid (not NULL or invalid)
+-- NOTE: date is now Date type (MATERIALIZED from block_time), so format validation is automatic
 SELECT 
-    'USE CASE 1.5: Date format validation' AS validation,
+    'USE CASE 1.5: Date validity check' AS validation,
     COUNT(*) AS invalid_date_count
 FROM transactions
-WHERE length(date) != 10 
-    OR date NOT LIKE '____-__-__'
-    OR toDateOrNull(date) IS NULL;
+WHERE date IS NULL 
+    OR date < toDate('2020-01-01')  -- Before Solana mainnet
+    OR date > today() + 1;  -- Not in future
 
 -- ============================================================================
 -- USE CASE 2: Program-Level Analytics
@@ -218,16 +227,17 @@ INNER JOIN failed_transactions f ON t.signature = f.signature;
 -- USE CASE 4: Time-Based Analytics (Time Series)
 -- ============================================================================
 -- Use Case: Query transactions by date/hour for time series analysis
--- Expected Queries: SELECT * FROM transactions WHERE date = '2024-12-30' AND hour = 14
--- Critical Fields: date, hour, block_time
+-- Expected Queries: SELECT * FROM transactions WHERE date = toDate('2024-12-30') AND hour = 14
+-- Critical Fields: date (Date MATERIALIZED), hour (UInt8 MATERIALIZED), block_time
 
 -- 4.1 Data Completeness: Check for NULL or missing date/hour values
+-- NOTE: date and hour are now MATERIALIZED columns, so they should never be NULL if block_time is valid
 SELECT 
     'USE CASE 4.1: NULL date/hour check' AS validation,
     COUNT(*) AS null_date_count,
     COUNT(*) AS null_hour_count
 FROM transactions
-WHERE date IS NULL OR date = '' OR hour IS NULL;
+WHERE date IS NULL OR hour IS NULL;
 
 -- 4.2 Data Accuracy: Verify hour is in valid range (0-23)
 SELECT 
@@ -238,15 +248,15 @@ FROM transactions
 WHERE hour > 23 OR hour < 0
 GROUP BY hour;
 
--- 4.3 Data Consistency: Verify date matches block_time (date should be derived from block_time)
--- NOTE: After fixing date calculation in Rust code, this should show 0 or very low count
--- The date field is calculated from block_time using UTC timezone to match ClickHouse's toDateTime()
+-- 4.3 Data Consistency: Verify date matches block_time (date is MATERIALIZED from block_time)
+-- NOTE: Since date is now MATERIALIZED as toDate(block_time), this should always be 0
+-- This validates that the MATERIALIZED column is working correctly
 SELECT 
     'USE CASE 4.3: Date/block_time consistency' AS validation,
     COUNT(*) AS inconsistent_count,
     COUNT(*) * 100.0 / (SELECT COUNT(*) FROM transactions WHERE block_time > 0) AS inconsistency_percentage
 FROM transactions
-WHERE date != formatDateTime(toDateTime(block_time), '%Y-%m-%d')
+WHERE date != toDate(block_time)
     AND block_time > 0;
 
 -- 4.4 Query Performance: Test date/hour filter with partition pruning
@@ -259,7 +269,7 @@ SELECT
     SUM(fee) AS total_fees,
     AVG(compute_units) AS avg_compute_units
 FROM transactions
-WHERE date = '2024-12-30'
+WHERE date = toDate('2024-12-30')
     AND hour BETWEEN 10 AND 14
 GROUP BY date, hour
 ORDER BY hour;
@@ -274,12 +284,12 @@ SELECT
     expected_days - actual_days AS missing_days
 FROM (
     SELECT 
-        min(toDate(date)) AS min_date,
-        max(toDate(date)) AS max_date,
-        dateDiff('day', min(toDate(date)), max(toDate(date))) + 1 AS expected_days,
+        min(date) AS min_date,
+        max(date) AS max_date,
+        dateDiff('day', min(date), max(date)) + 1 AS expected_days,
         COUNT(DISTINCT date) AS actual_days
     FROM transactions
-    WHERE date != ''
+    WHERE date IS NOT NULL
 );
 
 -- ============================================================================
@@ -325,7 +335,7 @@ SELECT
     SUM(success) AS successful_txs,
     (SUM(success) * 100.0 / COUNT(*)) AS success_rate
 FROM transactions
-WHERE date >= '2024-12-01'
+WHERE date >= toDate('2024-12-01')
 GROUP BY protocol_name
 ORDER BY total_txs DESC
 LIMIT 20;
@@ -395,7 +405,7 @@ SELECT
     MAX(fee) AS max_fee,
     SUM(fee) AS total_fees
 FROM transactions
-WHERE date >= '2024-12-01'
+WHERE date >= toDate('2024-12-01')
     AND protocol_name != ''
 GROUP BY protocol_name
 ORDER BY total_fees DESC
@@ -463,7 +473,7 @@ SELECT
     MAX(compute_units) AS max_cu,
     quantile(0.95)(compute_units) AS p95_compute_units
 FROM transactions
-WHERE date >= '2024-12-01'
+WHERE date >= toDate('2024-12-01')
     AND program_id != ''
 GROUP BY program_id
 HAVING COUNT(*) > 100
@@ -654,7 +664,7 @@ SELECT
     AVG(fee) AS avg_fee,
     AVG(compute_units) AS avg_compute_units
 FROM transactions
-WHERE date >= '2024-12-01'
+WHERE date >= toDate('2024-12-01')
 GROUP BY accounts_count
 ORDER BY accounts_count;
 
@@ -706,7 +716,7 @@ FROM failed_transactions;
 SELECT 
     'SUMMARY: Data quality score' AS metric,
     (
-        (SELECT COUNT(*) FROM transactions WHERE signature != '' AND protocol_name != '' AND date != '' AND slot > 0) * 100.0 / 
+        (SELECT COUNT(*) FROM transactions WHERE signature != '' AND protocol_name != '' AND date IS NOT NULL AND slot > 0) * 100.0 / 
         (SELECT COUNT(*) FROM transactions)
     ) AS transactions_quality_score,
     (
@@ -742,8 +752,8 @@ ORDER BY name;
 --    - This is NOT a data quality issue
 --
 -- 3. USE CASE 4.3 (Date/Block_Time Consistency):
---    - Should be 0 or very low after date calculation fix
---    - If high, check UTC timezone handling in Rust code
+--    - Should be 0 since date is now MATERIALIZED as toDate(block_time)
+--    - If non-zero, indicates an issue with the MATERIALIZED column calculation
 --
 -- 4. All other validations should pass with 0 errors or very low error rates
 --
