@@ -693,8 +693,8 @@ SELECT
     COUNT(DISTINCT signature) AS unique_signatures,
     COUNT(DISTINCT protocol_name) AS unique_protocols,
     COUNT(DISTINCT program_id) AS unique_programs,
-    MIN(date) AS earliest_date,
-    MAX(date) AS latest_date,
+    toString(MIN(date)) AS earliest_date,
+    toString(MAX(date)) AS latest_date,
     MIN(slot) AS min_slot,
     MAX(slot) AS max_slot
 FROM transactions
