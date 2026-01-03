@@ -9483,6 +9483,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "solixdb-indexer"
+version = "0.6.0"
+dependencies = [
+ "borsh",
+ "bs58",
+ "chrono",
+ "clickhouse",
+ "futures-util",
+ "hex",
+ "jetstreamer-firehose",
+ "serde",
+ "serde_json",
+ "solana-address 2.0.0",
+ "solana-message",
+ "tokio",
+ "toml 0.8.23",
+ "tracing",
+ "tracing-subscriber",
+ "yellowstone-grpc-proto",
+ "yellowstone-vixen-core",
+ "yellowstone-vixen-proc-macro",
+]
+
+[[package]]
 name = "spin"
 version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10540,30 +10564,6 @@ dependencies = [
  "thread_local",
  "tracing-core",
  "tracing-log",
-]
-
-[[package]]
-name = "transaction-parser"
-version = "0.6.0"
-dependencies = [
- "borsh",
- "bs58",
- "chrono",
- "clickhouse",
- "futures-util",
- "hex",
- "jetstreamer-firehose",
- "serde",
- "serde_json",
- "solana-address 2.0.0",
- "solana-message",
- "tokio",
- "toml 0.8.23",
- "tracing",
- "tracing-subscriber",
- "yellowstone-grpc-proto",
- "yellowstone-vixen-core",
- "yellowstone-vixen-proc-macro",
 ]
 
 [[package]]

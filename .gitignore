@@ -1,4 +1,40 @@
-/target
-logs/
+# Rust build artifacts
+/target/
+Cargo.lock
 
+# Logs
 logs/
+*.log
+*.log.*
+
+# User-specific configuration
+config.toml
+*.local.toml
+
+# Validation results
+validate_usecases_results.txt
+*.results.txt
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+flycheck*/
+
+# ClickHouse data (if running locally)
+clickhouse_data/
+
+# Environment files
+.env
+.env.local
+
+# Generated files
+docker-compose.parallel.yml

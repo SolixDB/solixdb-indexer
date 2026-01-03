@@ -55,7 +55,7 @@ RUN --mount=type=cache,target=/root/.cargo/registry \
     --mount=type=cache,target=/root/.cargo/git \
     --mount=type=cache,target=/app/target \
     cargo build --release && \
-    cp /app/target/release/transaction-parser /app/transaction-parser
+    cp /app/target/release/solixdb-indexer /app/solixdb-indexer
 
 # Runtime stage
 FROM ubuntu:24.04
@@ -70,11 +70,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy binary from builder
-COPY --from=builder /app/transaction-parser /app/transaction-parser
+COPY --from=builder /app/solixdb-indexer /app/solixdb-indexer
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD pgrep -f transaction-parser || exit 1
+    CMD pgrep -f solixdb-indexer || exit 1
 
 # Run the application
-ENTRYPOINT ["/app/transaction-parser"]
+ENTRYPOINT ["/app/solixdb-indexer"]

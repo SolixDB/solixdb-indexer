@@ -5,9 +5,9 @@ High-performance Solana blockchain data collection system for analytics platform
 ## Features
 
 - **Multi-protocol parsing**: Pumpfun, Jupiter, Raydium, Orca
-- **Batched inserts**: Efficient ClickHouse writes (1000 rows/batch)
+- **Batched inserts**: Efficient ClickHouse writes (50,000 rows/batch)
 - **Maximum compression**: ZSTD(22) on all fields
-- **Docker-ready**: Parallel collection with multiple instances
+- **Flexible deployment**: Run directly or use Docker (optional)
 - **Configurable**: Environment variables for all settings
 
 ## Quick Start
@@ -54,7 +54,7 @@ cargo build --release
 
 ### Config File (Recommended)
 
-Create a `config.toml` file (see `config.toml.example`):
+Create a `config.toml` file (copy from `config.toml.example`):
 
 ```toml
 [slots]
@@ -64,7 +64,7 @@ start = 377107390
 end = 377108390
 
 [clickhouse]
-url = "http://100.108.77.69:8123"
+url = "http://localhost:8123"
 clear_on_start = true
 
 [processing]
@@ -79,7 +79,7 @@ Environment variables **override** config file values:
 |----------|---------|-------------|
 | `SLOT_START` | `377107390` | Starting slot (Nov 1, 2025 0:00 UTC) |
 | `SLOT_END` | `377108390` | Ending slot (1k slots for testing) |
-| `THREADS` | `10` | Number of parallel threads |
+| `THREADS` | `1` | Number of parallel threads (config.toml.example uses 4) |
 | `CLICKHOUSE_URL` | `http://localhost:8123` | ClickHouse server URL (supports auth: `http://user:pass@host:port`) |
 | `CLEAR_DB_ON_START` | `false` | Clear database on startup |
 
@@ -153,16 +153,25 @@ tail -f logs/indexer-*.log
 tail -f logs/indexer-1.log
 
 # Check running processes
-ps aux | grep transaction-parser
+ps aux | grep solixdb-indexer
 ```
 
 **Stop:**
 ```bash
 # Stop all indexer processes
-pkill -f transaction-parser
+pkill -f solixdb-indexer
 ```
 
-## Docker Setup
+## Docker Setup (Optional - For Development/Testing Only)
+
+> **⚠️ Note:** Docker is **optional** and primarily for development/testing. For production deployment, use the binary directly (see [Production Deployment](#production-deployment) section).
+
+**Docker is useful for:**
+- Local development and testing
+- Contributors who want a consistent environment
+- CI/CD pipelines
+
+**For production:** Use direct binary execution (see Production Deployment section below).
 
 ### Quick Start with Parallel Indexers
 
@@ -322,7 +331,6 @@ docker exec -it clickhouse clickhouse-client
 
 # Then run queries:
 SELECT count() FROM transactions;
-SELECT count() FROM transaction_payloads;
 SELECT protocol_name, count() FROM transactions GROUP BY protocol_name;
 ```
 
@@ -339,15 +347,21 @@ docker-compose -f docker-compose.parallel.yml logs | grep -i "slot\|success\|fai
 
 ### Tables
 
-1. **transactions** - Fast analytics (metadata, metrics, time dimensions)
-2. **transaction_payloads** - Full data (parsed_data, raw_data, logs) - compressed
-3. **failed_transactions** - Parse failures for debugging
+1. **transactions** - Instruction-level analytics (metadata, metrics, time dimensions)
+   - Fields: signature, slot, block_time, program_id, protocol_name, instruction_type, success, fee, compute_units, accounts_count
+   - Materialized columns: date, hour (auto-calculated from block_time)
+   - Indexes: Bloom filters on protocol_name, program_id, signature
+   - Partitioned by month (toYYYYMM(date))
 
-All tables use ZSTD(22) compression and are partitioned by month.
+2. **failed_transactions** - Parse failures for debugging
+   - Same fields as transactions + raw_data, error_message, log_messages
+   - Compressed with ZSTD(22)
+
+All tables use ZSTD compression and are optimized for analytics queries.
 
 ## Performance
 
-- **Batched inserts**: 1000 rows per batch
+- **Batched inserts**: 50,000 rows per batch
 - **Compression**: Automatic (ZSTD 22)
 - **Parallel processing**: Configurable threads per instance
 - **November 2025**: ~6.5M slots, process in hours with multiple instances
@@ -382,6 +396,27 @@ docker-compose -f docker-compose.parallel.yml down
 
 ## Production Deployment
 
+### Recommended: Direct Binary Execution
+
+For production, run the binary directly (not in Docker):
+
+```bash
+# Build release binary
+cargo build --release
+
+# Run with environment variables or config.toml
+./target/release/solixdb-indexer
+
+# Or use the parallel indexer script
+./run_parallel_indexers.sh <start_slot> <end_slot> <num_processes> [threads] [clickhouse_url]
+```
+
+**Advantages:**
+- Better performance (no container overhead)
+- Easier resource management
+- Direct system integration
+- Simpler monitoring and logging
+
 ### ClickHouse Authentication
 
 For in-house ClickHouse with authentication, use the URL format:
@@ -394,7 +429,7 @@ CLICKHOUSE_URL=http://username:password@clickhouse-host:8123
 CLICKHOUSE_URL=https://username:password@clickhouse-host:8443
 
 # Example
-CLICKHOUSE_URL=http://solixdb:secure_password@10.0.0.5:8123
+CLICKHOUSE_URL=http://username:password@clickhouse-host:8123
 ```
 
 ### Production Features
@@ -407,9 +442,9 @@ CLICKHOUSE_URL=http://solixdb:secure_password@10.0.0.5:8123
 - **Graceful shutdown** (SIGTERM/SIGINT handlers)
 - **Config file support** (`config.toml` with env var override)
 - ZSTD compression (maximum)
-- Batched inserts (1000 rows/batch)
+- Batched inserts (50,000 rows/batch)
 
-📋 **See [PRODUCTION.md](PRODUCTION.md) for full production readiness checklist**
+📋 **See [validate_usecases.sql](validate_usecases.sql) for data quality validation queries**
 
 **Note:** For monitoring multiple instances, monitor ClickHouse directly rather than individual indexer processes.
 

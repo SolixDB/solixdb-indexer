@@ -8,7 +8,7 @@ resolver = "2"
 edition = "2021"
 license = "MIT"
 version = "0.6.0"
-repository = "https://github.com/priyanshpatel18/transaction-parser"
+repository = "https://github.com/SolixDB/solixdb-indexer"
 publish = false
 
 [workspace.dependencies]
@@ -63,7 +63,7 @@ yellowstone-grpc-proto = { version = "9", default-features = false }
 
 
 [package]
-name = "transaction-parser"
+name = "solixdb-indexer"
 edition.workspace = true
 license.workspace = true
 version.workspace = true

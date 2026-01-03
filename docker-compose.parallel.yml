@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   indexer-1:
-    image: myusername/solixdb-indexer:latest
+    image: solixdb-indexer:latest
     container_name: indexer-1
     environment:
       - SLOT_START=377107390

@@ -1,0 +1,21 @@
+# SolixDB Configuration Example
+# Copy this file to config.toml and modify as needed
+
+[slots]
+# Starting slot number
+start = 377107390
+# Ending slot number
+end = 377108390
+
+[clickhouse]
+# ClickHouse server URL
+# Supports authentication: http://username:password@host:port
+# Supports TLS: https://username:password@host:port
+url = "http://localhost:8123"
+# Clear database on startup (use with caution!)
+clear_on_start = false
+
+[processing]
+# Number of parallel threads for processing
+threads = 4
+
