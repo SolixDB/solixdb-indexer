@@ -8,8 +8,9 @@ use std::sync::Arc;
 use std::time::{Instant, SystemTime};
 use yellowstone_vixen_core::instruction::InstructionUpdate;
 
-// Calculate block_time from slot (Solana genesis: 2020-09-23 00:00:00 UTC = 1600646400)
-const GENESIS_TIMESTAMP: u64 = 1600646400;
+// fix 1: use anchor (nov 1 2025) to minimize time drift
+const ANCHOR_SLOT: u64 = 377_107_390;
+const ANCHOR_TIMESTAMP: i64 = 1_761_955_200;
 const SLOT_DURATION_SECONDS: f64 = 0.4; // ~400ms per slot
 
 pub async fn process_transaction(
@@ -32,8 +33,9 @@ pub async fn process_transaction(
     // Check if transaction was successful on-chain
     // If transaction failed on-chain, skip it entirely (only store successful transactions)
     // status field is an enum: Ok(()) for success, Err(...) for failure
-    let status_str = format!("{:?}", tx.transaction_status_meta.status);
-    if status_str.starts_with("Err") {
+
+    // fix 4: type-safe check instead of string parsing
+    if tx.transaction_status_meta.status.is_err() {
         // Transaction failed on-chain, skip storing it
         return Ok(());
     }
@@ -41,23 +43,20 @@ pub async fn process_transaction(
     // Extract transaction metadata
     let signature = tx.signature.to_string();
     let fee = tx.transaction_status_meta.fee;
-    let compute_units = tx.transaction_status_meta.compute_units_consumed.unwrap_or(0);
-    
+    let compute_units = tx
+        .transaction_status_meta
+        .compute_units_consumed
+        .unwrap_or(0);
+
     // Calculate block_time from slot (Solana genesis: 2020-09-23 00:00:00 UTC = 1600646400)
     // Note: Slot duration is ~400ms, but actual block times can vary
     // Using calculated value as fallback, but prefer actual block_time if available
-    let block_time = GENESIS_TIMESTAMP + ((tx.slot as f64 * SLOT_DURATION_SECONDS) as u64);
-    
-    // Extract log messages for failed transactions (for debugging)
-    let log_messages: Vec<String> = tx
-        .transaction_status_meta
-        .log_messages
-        .clone()
-        .unwrap_or_default()
-        .into_iter()
-        .collect();
-    let log_messages_str = log_messages.join("\n");
-    
+    // fix 1: calculate time from anchor
+    let slot_delta = tx.slot as i64 - ANCHOR_SLOT as i64;
+    let block_time = (ANCHOR_TIMESTAMP as f64 + (slot_delta as f64 * SLOT_DURATION_SECONDS)) as u64;
+
+    let log_messages_vec = &tx.transaction_status_meta.log_messages;
+
     // Date and hour are now calculated automatically by ClickHouse using MATERIALIZED columns
     // No need to calculate them in Rust - ClickHouse will compute them from block_time
 
@@ -92,8 +91,6 @@ pub async fn process_transaction(
                 inner: vec![],
             };
 
-            let raw_data = hex::encode(&ix.data);
-
             // Try parsing
             match try_parse(&instruction_update, parser_name).await {
                 Ok(parsed_instruction) => {
@@ -123,7 +120,7 @@ pub async fn process_transaction(
                     if let Err(e) = storage.insert_transaction(tx_record).await {
                         tracing::error!("Failed to insert transaction: {:?}", e);
                     }
-                    
+
                     _instruction_index += 1;
 
                     // Note: transaction_payloads table removed to save storage space
@@ -138,6 +135,12 @@ pub async fn process_transaction(
                     // Note: If transaction has multiple instructions, some may succeed (transactions table)
                     // and some may fail (failed_transactions table), causing same signature in both tables
                     // This is intentional for instruction-level tracking
+                    let raw_data = hex::encode(&ix.data);
+                    let log_messages_str = log_messages_vec
+                        .as_ref()
+                        .map(|logs| logs.join("\n"))
+                        .unwrap_or_default();
+
                     let failed_tx = FailedTransaction {
                         signature: signature.clone(),
                         slot: tx.slot,
@@ -146,13 +149,13 @@ pub async fn process_transaction(
                         protocol_name: parser_name.to_string(),
                         raw_data,
                         error_message: format!("{:?}", e),
-                        log_messages: log_messages_str.clone(),
+                        log_messages: log_messages_str,
                     };
 
                     if let Err(e) = storage.insert_failed(failed_tx).await {
                         tracing::error!("Failed to insert failed transaction: {:?}", e);
                     }
-                    
+
                     _instruction_index += 1;
                 }
             }
@@ -176,30 +179,38 @@ pub fn print_summary(
     let elapsed_secs = elapsed.as_secs_f64();
     let total_slots = slot_end - slot_start;
     let slots_per_second = total_slots as f64 / elapsed_secs;
-    
+
     // Format timestamps (UNIX timestamp)
-    let start_unix = start_timestamp.duration_since(std::time::UNIX_EPOCH)
+    let start_unix = start_timestamp
+        .duration_since(std::time::UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs();
-    let end_unix = end_timestamp.duration_since(std::time::UNIX_EPOCH)
+    let end_unix = end_timestamp
+        .duration_since(std::time::UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs();
-    
+
     println!("\n=== Timing ===");
-    println!("Start time: UNIX {} ({:.3}s before end)", start_unix, elapsed_secs);
+    println!(
+        "Start time: UNIX {} ({:.3}s before end)",
+        start_unix, elapsed_secs
+    );
     println!("End time:   UNIX {}", end_unix);
     println!("Elapsed:    {:.3}s", elapsed_secs);
-    println!("Slots:      {} ({} to {})", total_slots, slot_start, slot_end);
+    println!(
+        "Slots:      {} ({} to {})",
+        total_slots, slot_start, slot_end
+    );
     println!("Throughput: {:.2} slots/sec", slots_per_second);
-    
+
     println!("\n=== Metrics ===");
     let mut total_success = 0;
     let mut total_failed = 0;
-    
+
     // Sort by name for consistent output
     let mut sorted_names: Vec<_> = metrics.keys().collect();
     sorted_names.sort();
-    
+
     for name in sorted_names {
         if let Some((success, failed)) = metrics.get(name) {
             let s = success.load(Ordering::Relaxed);
@@ -207,15 +218,26 @@ pub fn print_summary(
             let t = s + f;
             total_success += s;
             total_failed += f;
-            let failed_pct = if t > 0 { (f as f64 / t as f64) * 100.0 } else { 0.0 };
-            println!("{}: {} success, {} failed, {} total ({:.2}% failed)", 
-                name, s, f, t, failed_pct);
+            let failed_pct = if t > 0 {
+                (f as f64 / t as f64) * 100.0
+            } else {
+                0.0
+            };
+            println!(
+                "{}: {} success, {} failed, {} total ({:.2}% failed)",
+                name, s, f, t, failed_pct
+            );
         }
     }
-    
+
     let total = total_success + total_failed;
-    let total_failed_pct = if total > 0 { (total_failed as f64 / total as f64) * 100.0 } else { 0.0 };
-    println!("Total: {} success, {} failed, {} total ({:.2}% failed)", 
+    let total_failed_pct = if total > 0 {
+        (total_failed as f64 / total as f64) * 100.0
+    } else {
+        0.0
+    };
+    println!(
+        "Total: {} success, {} failed, {} total ({:.2}% failed)",
         total_success, total_failed, total, total_failed_pct
     );
     println!("Threads used: {}", threads);
